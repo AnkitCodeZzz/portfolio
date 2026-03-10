@@ -21,6 +21,9 @@ export default function Home() {
           <Button variant="secondary" href="https://github.com/AnkitCodeZzz">
             GitHub
           </Button>
+          <Button variant="ghost" href="/log">
+            Build log
+          </Button>
         </div>
       </Container>
     </main>

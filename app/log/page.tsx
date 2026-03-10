@@ -2,19 +2,23 @@ import Typography from "../components/Typography";
 import Container from "../components/Container";
 
 const logs = [
-  {
-    date: "March 8, 2026",
-    entry: "Project planning complete. Tech stack finalized — Next.js, TypeScript, Tailwind CSS.",
-  },
-  {
-    date: "March 9, 2026",
-    entry: "Dev environment set up on Windows PC and MacBook. First deploy to Vercel. Built Typography, Container, and Button components. Design tokens system created.",
-  },
-  {
-    date: "March 10, 2026",
-    entry: "Type system finalized — Fraunces for display, Lora for body, Geist for UI. Updated Typography component with font prop.",
-  },
-];
+    {
+      date: "March 8, 2026",
+      entry: "Project planning complete. Tech stack finalized — Next.js, TypeScript, Tailwind CSS.",
+    },
+    {
+      date: "March 9, 2026",
+      entry: "Dev environment set up on Windows PC and MacBook. First deploy to Vercel. Built Typography, Container, and Button components. Design tokens system created.",
+    },
+    {
+      date: "March 10, 2026",
+      entry: "Type system finalized — Fraunces for display, Lora for body, Geist for UI. Updated Typography component with font prop.",
+    },
+    {
+      date: "March 11, 2026",
+      entry: "Added fonts to project. Created public build log page at /log for accountability. Linked it from homepage.",
+    },
+  ];
 
 export default function BuildLog() {
   return (

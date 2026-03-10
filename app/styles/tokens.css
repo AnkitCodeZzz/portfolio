@@ -12,8 +12,10 @@
   
     /* ==================== TYPOGRAPHY ==================== */
     /* Sizes — modular scale, will swap font-family later */
-    --font-family-sans: system-ui, -apple-system, sans-serif;
-    --font-family-mono: ui-monospace, monospace;
+    --font-family-display: var(--font-fraunces, "Fraunces"), Georgia, serif;
+    --font-family-body: var(--font-lora, "Lora"), Georgia, serif;
+    --font-family-ui: var(--font-geist, "Geist"), system-ui, sans-serif;
+    --font-family-mono: var(--font-geist-mono, "Geist Mono"), ui-monospace, monospace;
   
     --font-size-xs: 0.75rem;    /* 12px */
     --font-size-sm: 0.875rem;   /* 14px */

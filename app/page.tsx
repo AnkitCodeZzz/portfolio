@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <main style={{ paddingTop: "var(--spacing-4xl)" }}>
       <Container size="md">
-        <Typography as="h1" size="5xl" weight="bold">
+        <Typography as="h1" size="5xl" weight="bold" font="display">
           Ankit Mandal
         </Typography>
         <div style={{ marginTop: "var(--spacing-sm)" }}>
@@ -15,7 +15,7 @@ export default function Home() {
           </Typography>
         </div>
         <div style={{ marginTop: "var(--spacing-xl)", display: "flex", gap: "var(--spacing-sm)" }}>
-          <Button variant="primary" href="mailto:official.ankitmandal@gmail.com">
+          <Button variant="primary" href="mailto:your@email.com">
             Get in touch
           </Button>
           <Button variant="secondary" href="https://github.com/AnkitCodeZzz">

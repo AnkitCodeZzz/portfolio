@@ -19,6 +19,14 @@ const logs = [
     date: "March 11, 2026",
     entry: "Added fonts to project. Created public build log page at /log for accountability. Linked it from homepage.",
   },
+  {
+    date: "March 12, 2026",
+    entry: "Added contribution graph to build log page. Connected custom domain ankitmandal.tech to Vercel.",
+  },
+  {
+    date: "March 14, 2026",
+    entry: "Added contribution graph to build log page. Connected custom domain ankitmandal.tech to Vercel.",
+  },
 ];
 
 export default function BuildLog() {
@@ -34,7 +42,7 @@ export default function BuildLog() {
           </Typography>
         </div>
         <div style={{ marginTop: "var(--spacing-xl)" }}>
-          <ContributionGraph />
+          <ContributionGraph logs={logs} startDate="March 8, 2026" />
         </div>
         <div style={{ marginTop: "var(--spacing-2xl)" }}>
           {logs.map((log, index) => (

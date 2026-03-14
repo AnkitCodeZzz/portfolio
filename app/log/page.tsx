@@ -24,8 +24,12 @@ const logs = [
     entry: "Added contribution graph to build log page. Connected custom domain ankitmandal.tech to Vercel.",
   },
   {
-    date: "March 14, 2026",
+    date: "March 13, 2026",
     entry: "Added contribution graph to build log page. Connected custom domain ankitmandal.tech to Vercel.",
+  },
+  {
+    date: "March 14, 2026",
+    entry: "Refined contribution graph: streak-based tracking, adaptive tooltip with collision detection, auto-fill grid width. Learned useState, useLayoutEffect, and useRef.",
   },
 ];
 

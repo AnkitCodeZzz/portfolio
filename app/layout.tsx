@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Lora, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Header from "./components/Header";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -35,6 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${fraunces.variable} ${lora.variable} ${geist.variable} ${geistMono.variable}`}>
+        <Header />
         {children}
       </body>
     </html>

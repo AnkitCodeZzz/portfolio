@@ -1,33 +1,7 @@
 import Typography from "./components/Typography";
 import Container from "./components/Container";
 import ContributionGraph from "./components/ContributionGraph";
-
-const logs = [
-    {
-      date: "March 8, 2026",
-      entry: "Project planning complete. Tech stack finalized — Next.js, TypeScript, Tailwind CSS.",
-    },
-    {
-      date: "March 9, 2026",
-      entry: "Dev environment set up on Windows PC and MacBook. First deploy to Vercel. Built Typography, Container, and Button components. Design tokens system created.",
-    },
-    {
-      date: "March 10, 2026",
-      entry: "Type system finalized — Fraunces for display, Lora for body, Geist for UI. Updated Typography component with font prop.",
-    },
-    {
-      date: "March 11, 2026",
-      entry: "Added fonts to project. Created public build log page at /log for accountability. Linked it from homepage.",
-    },
-    {
-      date: "March 12, 2026",
-      entry: "Added contribution graph to build log page. Connected custom domain ankitmandal.tech to Vercel.",
-    },
-    {
-      date: "March 14, 2026",
-      entry: "Refined contribution graph: streak-based tracking, adaptive tooltip with collision detection, auto-fill grid width. Learned useState, useLayoutEffect, and useRef.",
-    },
-  ];
+import { logs } from "./lib/logs";
 
 export default function BuildLog() {
   return (

@@ -27,4 +27,8 @@ export const logs = [
       date: "March 15, 2026",
       entry: "Updated color system to final design language — cool off-white, blue-black ink, ink opacity scale, sage accent. Set up Claude Code for bulk changes. Made build log the homepage. Moved actual homepage to /home.",
     },
+    {
+      date: "March 16, 2026",
+      entry: "Built Header component with nav (work · notes · now · readme). Lowercase editorial labels, sage accent hover with underline animation. Nav links disabled until pages are ready. Applied to all pages via layout.tsx.",
+    },
   ];

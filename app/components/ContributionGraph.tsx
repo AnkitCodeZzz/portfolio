@@ -99,7 +99,7 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
   }
 
   return (
-    <div ref={containerRef} style={{ width: "100%", overflowX: "auto", position: "relative" }}>
+    <div ref={containerRef} style={{ width: "100%", overflowX: "hidden", position: "relative" }}>
       <div style={{ display: "flex", gap: "3px" }}>
         {weeks.map((week, weekIndex) => (
           <div key={weekIndex} style={{ display: "flex", flexDirection: "column", gap: "3px" }}>

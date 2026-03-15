@@ -31,7 +31,7 @@ const logs = [
 
 export default function BuildLog() {
   return (
-    <main style={{ paddingTop: "var(--spacing-4xl)", paddingBottom: "var(--spacing-4xl)" }}>
+    <main style={{ paddingTop: "var(--spacing-xl)", paddingBottom: "var(--spacing-4xl)" }}>
       <Container size="md">
         <Typography as="h1" size="4xl" weight="bold" font="display">
           Build Log

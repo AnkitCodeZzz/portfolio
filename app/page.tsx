@@ -12,7 +12,7 @@ export default function BuildLog() {
         </Typography>
         <div style={{ marginTop: "var(--spacing-sm)" }}>
           <Typography as="p" size="lg" color="secondary">
-            A public record of building this site from scratch — learning design engineering along the way.
+            A public record of building this site from scratch — learning agentic development along the way.
           </Typography>
         </div>
         <div style={{ marginTop: "var(--spacing-2xl)" }}>

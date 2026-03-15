@@ -27,6 +27,10 @@ const logs = [
       date: "March 14, 2026",
       entry: "Refined contribution graph: streak-based tracking, adaptive tooltip with collision detection, auto-fill grid width. Learned useState, useLayoutEffect, and useRef.",
     },
+    {
+      date: "March 15, 2026",
+      entry: "Updated color system to final design language — cool off-white, blue-black ink, ink opacity scale, sage accent. Set up Claude Code for bulk changes. Made build log the homepage. Moved actual homepage to /home.",
+    },
   ];
 
 export default function BuildLog() {

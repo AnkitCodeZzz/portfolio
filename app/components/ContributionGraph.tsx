@@ -117,11 +117,11 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
                 border = "none";
                 opacity = 0;
               } else if (isFuture) {
-                background = "var(--color-gray-50)";
-                border = "1px dashed var(--color-gray-200)";
+                background = "var(--color-surface)";
+                border = "1px dashed var(--ink-08)";
                 opacity = 0.5;
               } else if (isActive) {
-                background = "var(--color-gray-800)";
+                background = "var(--color-ink)";
                 border = "none";
               }
 
@@ -158,7 +158,7 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
             top: `${tooltipPos.top}px`,
             left: `${tooltipPos.left}px`,
             visibility: tooltipPos.ready ? "visible" : "hidden",
-            background: "var(--color-gray-900)",
+            background: "var(--color-ink)",
             color: "#fff",
             fontSize: "var(--font-size-xs)",
             fontFamily: "var(--font-family-ui)",
@@ -183,7 +183,7 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
         }}
       >
         <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
-          <div style={{ width: "10px", height: "10px", borderRadius: "2px", background: "var(--color-gray-800)" }} />
+          <div style={{ width: "10px", height: "10px", borderRadius: "2px", background: "var(--color-ink)" }} />
           <span style={{ fontSize: "var(--font-size-xs)", color: "var(--color-text-muted)", fontFamily: "var(--font-family-ui)" }}>Active</span>
         </div>
         <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
@@ -191,7 +191,7 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
           <span style={{ fontSize: "var(--font-size-xs)", color: "var(--color-text-muted)", fontFamily: "var(--font-family-ui)" }}>Missed</span>
         </div>
         <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
-          <div style={{ width: "10px", height: "10px", borderRadius: "2px", background: "var(--color-gray-50)", border: "1px dashed var(--color-gray-200)", opacity: 0.5 }} />
+          <div style={{ width: "10px", height: "10px", borderRadius: "2px", background: "var(--color-surface)", border: "1px dashed var(--ink-08)", opacity: 0.5 }} />
           <span style={{ fontSize: "var(--font-size-xs)", color: "var(--color-text-muted)", fontFamily: "var(--font-family-ui)" }}>Upcoming</span>
         </div>
       </div>

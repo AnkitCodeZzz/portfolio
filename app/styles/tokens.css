@@ -37,28 +37,37 @@
     --font-weight-bold: 700;
   
     /* ==================== COLORS ==================== */
-    /* Neutral palette — placeholder, swap with your brand colors later */
-    --color-gray-50: #fafafa;
-    --color-gray-100: #f5f5f5;
-    --color-gray-200: #e5e5e5;
-    --color-gray-300: #d4d4d4;
-    --color-gray-400: #a3a3a3;
-    --color-gray-500: #737373;
-    --color-gray-600: #525252;
-    --color-gray-700: #404040;
-    --color-gray-800: #262626;
-    --color-gray-900: #171717;
-    --color-gray-950: #0a0a0a;
-  
-    /* Semantic colors — these reference the palette above */
-    --color-bg-primary: var(--color-gray-50);
-    --color-bg-secondary: #ffffff;
-    --color-text-primary: var(--color-gray-900);
-    --color-text-secondary: var(--color-gray-600);
-    --color-text-muted: var(--color-gray-400);
-    --color-border: var(--color-gray-200);
-    --color-accent: #2563eb;       /* placeholder blue — swap later */
-    --color-accent-hover: #1d4ed8;
+    /* Foundation */
+    --color-bg: #f7f7f5;
+    --color-ink: #0c0c18;
+    --color-surface: #efefed;
+    --color-border: #e2e2df;
+
+    /* Ink opacity scale — always use ink at opacity, never mix gray */
+    --ink-100: rgba(12, 12, 24, 1.00);
+    --ink-80: rgba(12, 12, 24, 0.80);
+    --ink-60: rgba(12, 12, 24, 0.60);
+    --ink-40: rgba(12, 12, 24, 0.40);
+    --ink-20: rgba(12, 12, 24, 0.20);
+    --ink-08: rgba(12, 12, 24, 0.08);
+
+    /* Semantic colors */
+    --color-bg-primary: var(--color-bg);
+    --color-bg-secondary: var(--color-surface);
+    --color-text-primary: var(--ink-100);
+    --color-text-secondary: var(--ink-60);
+    --color-text-muted: var(--ink-40);
+
+    /* Primary accent — Sage */
+    --color-accent: #8fada0;
+    --color-accent-bg: #e6eeea;
+
+    /* Category accents */
+    --color-a: #8fada0; --color-a-bg: #e6eeea; /* sage */
+    --color-b: #8fa8c0; --color-b-bg: #e8edf2; /* steel blue */
+    --color-c: #a89cbd; --color-c-bg: #edeaf3; /* dusk violet */
+    --color-d: #a8a090; --color-d-bg: #edeae4; /* warm stone */
+    --color-e: #b09898; --color-e-bg: #f0eaea; /* muted rose */
   
     /* ==================== BORDERS ==================== */
     --radius-sm: 4px;

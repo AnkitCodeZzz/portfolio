@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <main style={{ paddingTop: "var(--spacing-4xl)" }}>
       <Container size="md">
-        <Typography as="h1" size="5xl" weight="bold" font="display">
+        <Typography as="h1" size="5xl" weight="medium" font="display">
           Ankit Mandal
         </Typography>
         <div style={{ marginTop: "var(--spacing-sm)" }}>

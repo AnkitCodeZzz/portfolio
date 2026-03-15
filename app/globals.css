@@ -2,8 +2,8 @@
 @import "./styles/tokens.css";
 
 body {
-  background: var(--color-bg-primary);
-  color: var(--color-text-primary);
-  font-family: var(--font-lora), Georgia, serif;
+  background: var(--color-bg);
+  color: var(--ink-100);
+  font-family: var(--font-lora, "Lora"), Georgia, serif;
   line-height: var(--line-height-normal);
 }

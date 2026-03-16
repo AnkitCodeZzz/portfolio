@@ -58,8 +58,8 @@ export default function Home() {
   return (
     <main style={{ paddingTop: "var(--spacing-2xl)" }}>
       <Container size="md">
-        <Typography as="h1" size="4xl" weight="light" font="display" letterSpacing="var(--letter-spacing-tight)">
-          Hey, I'm Ankit.
+        <Typography as="h1" size="4xl" weight="light" font="display" letterSpacing="var(--letter-spacing-tight)" lineHeight={1.1} fontVariationSettings="'opsz' 144">
+        Hey, I'm Ankit.
         </Typography>
         <div style={{ marginTop: "var(--spacing-sm)" }}>
           <Typography as="p" size="lg" color="secondary">
@@ -68,7 +68,7 @@ export default function Home() {
         </div>
 
         <div style={{ marginTop: "var(--spacing-4xl)" }}>
-          <Typography as="h2" size="3xl" font="display" weight="light" letterSpacing="var(--letter-spacing-tight)">
+          <Typography as="h2" size="3xl" font="display" weight="light" letterSpacing="var(--letter-spacing-tight)" lineHeight={1.15} fontVariationSettings="'opsz' 72">
             Selected Work
           </Typography>
           <div>
@@ -111,7 +111,7 @@ export default function Home() {
         </div>
 
         <div style={{ marginTop: "var(--spacing-4xl)" }}>
-          <Typography as="h2" size="3xl" font="display" weight="light" letterSpacing="var(--letter-spacing-tight)">
+          <Typography as="h2" size="3xl" font="display" weight="light" letterSpacing="var(--letter-spacing-tight)" lineHeight={1.15} fontVariationSettings="'opsz' 72">
             Experience & Education
           </Typography>
           <div>

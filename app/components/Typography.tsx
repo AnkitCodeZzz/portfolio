@@ -5,6 +5,8 @@ type TypographyProps = {
   color?: "primary" | "secondary" | "muted";
   font?: "display" | "body" | "ui" | "mono";
   letterSpacing?: string;
+  lineHeight?: string | number;
+  fontVariationSettings?: string;
   children: React.ReactNode;
 };
 
@@ -15,6 +17,8 @@ export default function Typography({
   color = "primary",
   font = "body",
   letterSpacing,
+  lineHeight,
+  fontVariationSettings,
   children,
 }: TypographyProps) {
   return (
@@ -24,8 +28,9 @@ export default function Typography({
         fontWeight: `var(--font-weight-${weight})`,
         color: `var(--color-text-${color})`,
         fontFamily: `var(--font-family-${font})`,
-        lineHeight: "var(--line-height-normal)",
+        lineHeight: lineHeight ?? "var(--line-height-normal)",
         ...(letterSpacing ? { letterSpacing } : {}),
+        ...(fontVariationSettings ? { fontVariationSettings } : {}),
       }}
     >
       {children}

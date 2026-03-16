@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&display=swap');
 @import "tailwindcss";
 @import "./styles/tokens.css";
 
@@ -6,4 +7,6 @@ body {
   color: var(--ink-60);
   font-family: var(--font-lora, "Lora"), Georgia, serif;
   line-height: var(--line-height-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

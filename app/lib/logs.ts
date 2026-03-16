@@ -31,4 +31,8 @@ export const logs = [
       date: "March 16, 2026",
       entry: "Built Header component with nav (work · notes · now · readme). Lowercase editorial labels, sage accent hover with underline animation. Nav links disabled until pages are ready. Applied to all pages via layout.tsx.",
     },
+    {
+      date: "March 17, 2026",
+      entry: "Built homepage layout at /home — hero, selected work, experience & education. Fixed Fraunces optical size axis with direct Google Fonts import. Refined typography: Fraunces wt 300, letter-spacing, line-height. Tags with accent colors. Nav switched to mono font.",
+    },
   ];

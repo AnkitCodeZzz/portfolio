@@ -56,7 +56,10 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
   const weeks = getWeeksGrid(start, numWeeks);
 
   const logDates = new Set(
-    logs.map((log) => toLocalDateStr(new Date(log.date)))
+    logs.map((log) => {
+      const d = new Date(log.date + " 12:00:00");
+      return toLocalDateStr(d);
+    })
   );
 
   useLayoutEffect(() => {

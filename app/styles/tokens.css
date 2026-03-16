@@ -30,11 +30,17 @@
     --line-height-tight: 1.2;
     --line-height-normal: 1.5;
     --line-height-relaxed: 1.75;
-  
+    --line-height-body: 1.78;
+
+    --font-weight-light: 300;
     --font-weight-normal: 400;
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
+
+    --letter-spacing-tight: -0.02em;
+    --letter-spacing-wide: 0.1em;
+    --letter-spacing-tag: 0.06em;
   
     /* ==================== COLORS ==================== */
     /* Foundation */
@@ -55,7 +61,7 @@
     --color-bg-primary: var(--color-bg);
     --color-bg-secondary: var(--color-surface);
     --color-text-primary: var(--ink-100);
-    --color-text-secondary: var(--ink-60);
+    --color-text-secondary: rgba(12, 12, 24, 0.62);
     --color-text-muted: var(--ink-40);
 
     /* Primary accent — Sage */

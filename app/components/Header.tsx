@@ -19,11 +19,14 @@ export default function Header() {
           color: var(--ink-80);
           text-decoration: none;
           font-family: var(--font-family-display);
+          font-weight: 300;
+          font-size: 16px;
         }
         .header-nav-link {
-          color: var(--ink-20);
+          color: rgba(12, 12, 24, 0.45);
           text-decoration: none;
           cursor: default;
+          font-family: var(--font-family-mono);
         }
       `}</style>
       <header
@@ -50,17 +53,16 @@ export default function Header() {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "var(--spacing-sm)",
+                gap: "var(--spacing-md)",
                 listStyle: "none",
                 margin: 0,
                 padding: 0,
               }}
             >
               {/* TODO: Re-enable nav links when pages are ready */}
-              {navLinks.map(({ label }, index) => (
-                <li key={label} style={{ display: "flex", alignItems: "center", gap: "var(--spacing-sm)" }}>
-                  {index > 0 && <span style={{ color: "var(--ink-20)", fontSize: "16px", userSelect: "none" }}>·</span>}
-                  <span className="header-nav-link">{label}</span>
+              {navLinks.map(({ label }) => (
+                <li key={label}>
+                  <span className="header-nav-link">/{label}</span>
                 </li>
               ))}
             </ul>

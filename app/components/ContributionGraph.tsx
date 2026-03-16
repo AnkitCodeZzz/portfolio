@@ -12,6 +12,10 @@ type ContributionGraphProps = {
   startDate: string;
 };
 
+function toLocalDateStr(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
 function getWeeksGrid(start: Date, numWeeks: number): Date[][] {
   const weeks: Date[][] = [];
   const current = new Date(start);
@@ -52,7 +56,7 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
   const weeks = getWeeksGrid(start, numWeeks);
 
   const logDates = new Set(
-    logs.map((log) => new Date(log.date).toDateString())
+    logs.map((log) => toLocalDateStr(new Date(log.date)))
   );
 
   useLayoutEffect(() => {
@@ -104,9 +108,9 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
         {weeks.map((week, weekIndex) => (
           <div key={weekIndex} style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
             {week.map((day, dayIndex) => {
-              const isBeforeStart = day < start;
-              const isFuture = day > today;
-              const isActive = !isBeforeStart && !isFuture && logDates.has(day.toDateString());
+              const isBeforeStart = toLocalDateStr(day) < toLocalDateStr(start);
+              const isFuture = toLocalDateStr(day) > toLocalDateStr(today);
+              const isActive = !isBeforeStart && !isFuture && logDates.has(toLocalDateStr(day));
 
               let background = "transparent";
               let border = "1px solid var(--color-border)";
@@ -121,7 +125,7 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
                 border = "1px dashed var(--ink-08)";
                 opacity = 0.5;
               } else if (isActive) {
-                background = "var(--color-ink)";
+                background = "var(--color-accent)";
                 border = "none";
               }
 
@@ -183,7 +187,7 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
         }}
       >
         <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
-          <div style={{ width: "10px", height: "10px", borderRadius: "2px", background: "var(--color-ink)" }} />
+          <div style={{ width: "10px", height: "10px", borderRadius: "2px", background: "var(--color-accent)" }} />
           <span style={{ fontSize: "var(--font-size-xs)", color: "var(--color-text-muted)", fontFamily: "var(--font-family-ui)" }}>Active</span>
         </div>
         <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>

@@ -3,7 +3,7 @@
 
 body {
   background: var(--color-bg);
-  color: var(--ink-100);
+  color: var(--ink-60);
   font-family: var(--font-lora, "Lora"), Georgia, serif;
-  line-height: var(--line-height-normal);
+  line-height: var(--line-height-body);
 }

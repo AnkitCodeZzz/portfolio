@@ -5,9 +5,9 @@ import { logs } from "./lib/logs";
 
 export default function BuildLog() {
   return (
-    <main style={{ paddingTop: "var(--spacing-xl)", paddingBottom: "var(--spacing-4xl)" }}>
+    <main style={{ paddingTop: "var(--spacing-2xl)", paddingBottom: "var(--spacing-4xl)" }}>
       <Container size="md">
-        <Typography as="h1" size="4xl" weight="bold" font="display">
+        <Typography as="h1" size="4xl" weight="semibold" font="display">
           Build Log
         </Typography>
         <div style={{ marginTop: "var(--spacing-sm)" }}>

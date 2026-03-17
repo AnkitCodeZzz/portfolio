@@ -10,3 +10,223 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+@layer base {
+  .prose h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 24px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    margin-top: 2em;
+    margin-bottom: 0.5em;
+    color: var(--ink-100);
+  }
+
+  .prose h3 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.35;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    color: var(--ink-100);
+  }
+
+  .prose p {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.78;
+    color: var(--ink-60);
+    margin-bottom: 1.2em;
+  }
+
+  .prose a {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .prose strong {
+    font-weight: 600;
+    color: var(--ink-80);
+  }
+
+  .prose ul {
+    list-style: disc;
+    padding-left: 1.5em;
+    margin-bottom: 1.2em;
+  }
+
+  .prose ol {
+    list-style: decimal;
+    padding-left: 1.5em;
+    margin-bottom: 1.2em;
+  }
+
+  .prose li {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.78;
+    color: var(--ink-60);
+    margin-bottom: 0.4em;
+  }
+
+  .prose blockquote {
+    border-left: 3px solid var(--color-accent);
+    background: var(--color-accent-bg);
+    padding: 12px 20px;
+    margin: 1.5em 0;
+    font-family: 'Fraunces', Georgia, serif;
+    font-style: italic;
+    font-size: 17px;
+    font-weight: 300;
+    color: var(--ink-60);
+    line-height: 1.5;
+  }
+
+  .prose code {
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 14px;
+    background: var(--color-surface);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--ink-80);
+  }
+
+  .prose pre {
+    background: #efefed;
+    color: rgba(12, 12, 24, 0.8);
+    padding: 16px 20px;
+    border-radius: 8px;
+    border: 1px solid #e2e2df;
+    overflow-x: auto;
+    margin: 1.5em 0;
+  }
+
+  .prose pre code {
+    background: none;
+    padding: 0;
+    color: rgba(12, 12, 24, 0.8);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .prose img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin: 1.5em 0;
+  }
+
+  .prose hr {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 2em 0;
+  }
+
+  .prose table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5em 0;
+    font-family: 'Lora', Georgia, serif;
+    font-size: 16px;
+    line-height: 1.78;
+    border: 1px solid rgba(12, 12, 24, 0.08);
+  }
+
+  .prose th {
+    text-align: left;
+    font-weight: 500;
+    color: rgba(12, 12, 24, 0.8);
+    padding: 10px 16px;
+    border: 1px solid rgba(12, 12, 24, 0.08);
+    font-family: 'Geist', system-ui, sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: #efefed;
+  }
+
+  .prose td {
+    padding: 10px 16px;
+    border: 1px solid rgba(12, 12, 24, 0.08);
+    color: rgba(12, 12, 24, 0.6);
+  }
+
+  .prose ul:has(input[type="checkbox"]) {
+    padding-left: 0;
+  }
+
+  .prose li:has(> input[type="checkbox"]) {
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: none;
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 14px;
+    color: rgba(12, 12, 24, 0.6);
+  }
+
+  .prose li input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid rgba(12, 12, 24, 0.2);
+    border-radius: 2px;
+    cursor: default;
+    flex-shrink: 0;
+    position: relative;
+    margin: 0;
+  }
+
+  .prose li input[type="checkbox"]:checked {
+    background: #8fada0;
+    border-color: #8fada0;
+  }
+
+  .prose li input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 10px;
+    font-weight: 400;
+    font-family: system-ui, sans-serif;
+    line-height: 1;
+  }
+
+  .prose mark {
+    background: #e6eeea;
+    color: rgba(12, 12, 24, 0.8);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .prose del {
+    text-decoration: line-through;
+    color: rgba(12, 12, 24, 0.3);
+  }
+
+  .prose sup {
+    font-size: 0.75em;
+    color: #8fada0;
+    font-weight: 500;
+  }
+
+  .prose dt {
+    font-weight: 600;
+    color: rgba(12, 12, 24, 1);
+    margin-top: 1em;
+  }
+
+  .prose dd {
+    color: rgba(12, 12, 24, 0.6);
+    margin-left: 1.5em;
+    margin-bottom: 0.5em;
+  }
+}

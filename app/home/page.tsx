@@ -58,13 +58,34 @@ export default function Home() {
   return (
     <main style={{ paddingTop: "var(--spacing-2xl)" }}>
       <Container size="md">
-        <Typography as="h1" size="4xl" weight="light" font="display" letterSpacing="var(--letter-spacing-tight)" lineHeight={1.1} fontVariationSettings="'opsz' 144">
-        Hey, I'm Ankit.
-        </Typography>
+        <h1
+          style={{
+            fontSize: "32px",
+            letterSpacing: "-0.02em",
+            fontWeight: 300,
+            lineHeight: 1.1,
+            fontVariationSettings: "'opsz' 144",
+            fontFamily: "var(--font-family-display)",
+            color: "var(--color-text-primary)",
+            margin: 0,
+          }}
+        >
+          Why I stopped using component libraries.
+        </h1>
         <div style={{ marginTop: "var(--spacing-sm)" }}>
-          <Typography as="p" size="lg" color="secondary">
-            Designer - curious by default, guided by data, precise by habit.
-          </Typography>
+          <p
+            style={{
+              fontFamily: "var(--font-family-display)",
+              fontStyle: "italic",
+              fontSize: "17px",
+              fontWeight: 300,
+              color: "var(--ink-40)",
+              lineHeight: 1.35,
+              margin: 0,
+            }}
+          >
+            Designer — curious by default, guided by data, precise by habit.
+          </p>
         </div>
 
         <div style={{ marginTop: "var(--spacing-4xl)" }}>
@@ -85,9 +106,9 @@ export default function Home() {
                   {name}
                 </Typography>
                 <div style={{ marginTop: "var(--spacing-xs)" }}>
-                  <Typography as="p" size="base" color="secondary">
+                  <p style={{ fontFamily: "var(--font-family-body)", fontSize: "16px", lineHeight: 1.78, color: "var(--ink-60)", margin: 0 }}>
                     {description}
-                  </Typography>
+                  </p>
                 </div>
                 <div style={{ marginTop: "var(--spacing-sm)" }}>
                   <span style={{
@@ -133,9 +154,9 @@ export default function Home() {
                     {company}
                   </Typography>
                   <div style={{ marginTop: "var(--spacing-xs)" }}>
-                    <Typography as="p" size="base" color="secondary">
+                    <p style={{ fontFamily: "var(--font-family-body)", fontSize: "16px", lineHeight: 1.78, color: "var(--ink-60)", margin: 0 }}>
                       {description}
-                    </Typography>
+                    </p>
                   </div>
                   <div style={{ marginTop: "var(--spacing-sm)" }}>
                     <span style={{

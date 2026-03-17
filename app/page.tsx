@@ -8,7 +8,7 @@ export default function BuildLog() {
     <main style={{ paddingTop: "var(--spacing-2xl)", paddingBottom: "var(--spacing-4xl)" }}>
       <Container size="md">
         <Typography as="h1" size="4xl" weight="semibold" font="display">
-          Build Log
+          Build Log...
         </Typography>
         <div style={{ marginTop: "var(--spacing-sm)" }}>
           <Typography as="p" size="lg" color="secondary">

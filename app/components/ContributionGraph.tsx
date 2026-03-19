@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useLayoutEffect } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 
 type Log = {
   date: string;
@@ -44,10 +44,16 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
   const tooltipRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const [today, setToday] = useState<Date | null>(null);
+
+  useEffect(() => {
+    const now = new Date();
+    now.setHours(23, 59, 59, 999);
+    setToday(now);
+  }, []);
+
   const start = new Date(startDate);
   start.setHours(0, 0, 0, 0);
-  const today = new Date();
-  today.setHours(23, 59, 59, 999);
 
   const squareSize = 14;
   const gap = 3;
@@ -111,10 +117,9 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
         {weeks.map((week, weekIndex) => (
           <div key={weekIndex} style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
             {week.map((day, dayIndex) => {
-              const todayStr = toLocalDateStr(today);
               const dayStr = toLocalDateStr(day);
               const isBeforeStart = dayStr < toLocalDateStr(start);
-              const isFuture = dayStr > todayStr;
+              const isFuture = today === null || dayStr > toLocalDateStr(today);
               const isActive = !isBeforeStart && !isFuture && logDates.has(dayStr);
 
               let background = "transparent";

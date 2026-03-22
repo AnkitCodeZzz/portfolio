@@ -35,4 +35,8 @@ export const logs = [
       date: "March 17, 2026",
       entry: "Built homepage layout at /home — hero, selected work, experience & education. Refined typography: Fraunces wt 300, letter-spacing, line-height. Tags with accent colors. Nav switched to mono font. Set up MDX blog system with prose styling. Added footer. Fixed contribution graph timezone.",
     },
+    {
+      date: "March 22, 2026",
+      entry: "Set up Git branching workflow — feature/header, feature/homepage, feature/notes, feature/readme. Cleaned main branch to only show build log and footer. Fixed Vercel build error.",
+    },
   ];

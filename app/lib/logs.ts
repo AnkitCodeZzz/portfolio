@@ -39,4 +39,8 @@ export const logs = [
       date: "March 22, 2026",
       entry: "Set up Git branching workflow — feature/header, feature/homepage, feature/notes, feature/readme. Cleaned main branch to only show build log and footer. Fixed Vercel build error.",
     },
-  ];
+    {
+      date: "April 5, 2026",
+      entry: "Homepage Copywriting and Visual Design refinement",
+    },
+];

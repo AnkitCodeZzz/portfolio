@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import Container from "./Container";
 
 const sharedText: React.CSSProperties = {
@@ -33,6 +34,12 @@ function FooterLink({ href, children, style }: { href: string; children: React.R
 const Dot = () => <span style={{ margin: "0 6px" }}>·</span>;
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  if (pathname === "/") {
+    return null;
+  }
+
   return (
     <footer style={{ borderTop: "1px solid var(--color-border)" }}>
       <Container>

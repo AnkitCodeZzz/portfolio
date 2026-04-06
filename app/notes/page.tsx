@@ -35,7 +35,7 @@ export default function NotesPage() {
               margin: 0,
             }}
           >
-            Thinking out loud — design, craft, and whatever's on my mind.
+            Thinking out loud — design, craft, and whatever&apos;s on my mind.
           </p>
         </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useLayoutEffect } from "react";
+import { useState, useRef, useLayoutEffect } from "react";
 
 type Log = {
   date: string;
@@ -44,21 +44,31 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
   const tooltipRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [today, setToday] = useState<Date | null>(null);
+  const [containerWidth, setContainerWidth] = useState(700);
 
-  useEffect(() => {
-    const now = new Date();
-    now.setHours(23, 59, 59, 999);
-    setToday(now);
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const updateWidth = (width: number) => setContainerWidth(width || 700);
+    updateWidth(container.offsetWidth);
+
+    const observer = new ResizeObserver((entries) => {
+      updateWidth(entries[0]?.contentRect.width ?? container.offsetWidth);
+    });
+
+    observer.observe(container);
+    return () => observer.disconnect();
   }, []);
 
   const start = new Date(startDate);
   start.setHours(0, 0, 0, 0);
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
 
   const squareSize = 14;
   const gap = 3;
-  const containerWidth = containerRef.current?.offsetWidth || 700;
-  const numWeeks = Math.floor(containerWidth / (squareSize + gap));
+  const numWeeks = Math.max(1, Math.floor(containerWidth / (squareSize + gap)));
   const weeks = getWeeksGrid(start, numWeeks);
 
   const logDates = new Set(
@@ -119,7 +129,7 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
             {week.map((day, dayIndex) => {
               const dayStr = toLocalDateStr(day);
               const isBeforeStart = dayStr < toLocalDateStr(start);
-              const isFuture = today === null || dayStr > toLocalDateStr(today);
+              const isFuture = dayStr > toLocalDateStr(today);
               const isActive = !isBeforeStart && !isFuture && logDates.has(dayStr);
 
               let background = "transparent";

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Container from "./Container";
 
 const navLinks = [
@@ -11,6 +12,12 @@ const navLinks = [
 ];
 
 export default function Header() {
+  const pathname = usePathname();
+
+  if (pathname === "/") {
+    return null;
+  }
+
   return (
     <>
       <style>{`

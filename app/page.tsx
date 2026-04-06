@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useId } from "react";
+import InteractiveRuler from "./components/InteractiveRuler";
 import { getAllNotes } from "./lib/notes";
 import styles from "./page.module.css";
 
@@ -184,19 +185,10 @@ export default function HomePage() {
       </header>
 
       <div className={styles.pageBody}>
-        <aside className={styles.sidebar} aria-hidden="true">
-          {sidebarLabels.map((label) => (
-            <div key={label} className={styles.sidebarTick}>
-              <div className={styles.sidebarLabelWrap}>
-                <span className={styles.sidebarLabel}>{label}</span>
-              </div>
-              <span className={styles.sidebarDash} />
-            </div>
-          ))}
-        </aside>
+        <InteractiveRuler labels={sidebarLabels} />
 
-        <div className={styles.main}>
-          <section className={styles.hero}>
+        <div className={styles.main} data-ruler-content="main">
+          <section className={styles.hero} data-ruler-track>
             <div className={styles.heroTop}>
               <h1 className={styles.heroTitle}>
                 Hey,
@@ -218,7 +210,7 @@ export default function HomePage() {
 
           <Divider />
 
-          <section className={styles.section} aria-labelledby="projects-title">
+          <section className={styles.section} aria-labelledby="projects-title" data-ruler-track>
             <div className={styles.sectionHeader}>
               <h2 id="projects-title" className={styles.sectionTitle}>
                 My Projects
@@ -243,7 +235,7 @@ export default function HomePage() {
 
           <Divider />
 
-          <section className={styles.section} aria-labelledby="notes-title">
+          <section className={styles.section} aria-labelledby="notes-title" data-ruler-track>
             <div className={styles.sectionHeader}>
               <h2 id="notes-title" className={styles.sectionTitle}>
                 Latest Notes
@@ -280,7 +272,11 @@ export default function HomePage() {
 
           <Divider />
 
-          <section className={`${styles.section} ${styles.backgroundSection}`} aria-labelledby="background-title">
+          <section
+            className={`${styles.section} ${styles.backgroundSection}`}
+            aria-labelledby="background-title"
+            data-ruler-track
+          >
             <div className={styles.backgroundHeader}>
               <h2 id="background-title" className={styles.sectionTitle}>
                 My Background
@@ -330,7 +326,7 @@ export default function HomePage() {
           <Divider />
         </div>
 
-        <footer className={styles.footer}>
+        <footer className={styles.footer} data-ruler-track>
           <div className={styles.footerInner}>
             <span className={styles.footerCopy}>
               <span>© Ankit Mandal</span>

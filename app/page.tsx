@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useId } from "react";
 import { getAllNotes } from "./lib/notes";
 import styles from "./page.module.css";
 
@@ -83,9 +84,33 @@ function XIcon() {
 }
 
 function Divider() {
+  const patternId = useId();
+  const clipId = useId();
+
   return (
     <div className={styles.dividerWrap} aria-hidden="true">
-      <div className={styles.divider} />
+      <div className={styles.divider}>
+        <svg className={styles.dividerPattern} width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern
+              id={patternId}
+              patternUnits="userSpaceOnUse"
+              width="4"
+              height="4"
+              patternTransform="scale(1.5)"
+            >
+              <g clipPath={`url(#${clipId})`}>
+                <path d="M1 -1L5 3" stroke="currentColor" strokeWidth="0.5" />
+                <path d="M-1 1L3 5" stroke="currentColor" strokeWidth="0.5" />
+              </g>
+            </pattern>
+            <clipPath id={clipId}>
+              <rect width="4" height="4" fill="white" />
+            </clipPath>
+          </defs>
+          <rect x="0" y="0" width="100%" height="100%" fill={`url(#${patternId})`} />
+        </svg>
+      </div>
     </div>
   );
 }
@@ -307,7 +332,11 @@ export default function HomePage() {
 
         <footer className={styles.footer}>
           <div className={styles.footerInner}>
-            <span className={styles.footerCopy}>© Ankit Mandal · {new Date().getFullYear()}</span>
+            <span className={styles.footerCopy}>
+              <span>© Ankit Mandal</span>
+              <span className={styles.footerMutedDot}>•</span>
+              <span>{new Date().getFullYear()}</span>
+            </span>
             <div className={styles.footerLinks}>
               <a href="https://x.com/Ankit__TwT" target="_blank" rel="noreferrer" className={styles.footerLink}>
                 <XIcon />

@@ -57,7 +57,7 @@
   align-items: center;
   gap: 20px;
   font-family: var(--font-family-mono);
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1;
   color: var(--home-muted);
 }
@@ -67,15 +67,22 @@
 }
 
 .mobileNavRow {
-  min-height: 41px;
   display: flex;
   align-items: center;
+  padding-top: 8px;
+  padding-bottom: 8px;
   background: var(--home-panel);
   border-top: 1px solid var(--home-border);
 }
 
 .navItem,
-.inactiveLink,
+.inactiveLink {
+  font-family: var(--font-family-mono);
+  font-size: 14px;
+  line-height: 1;
+  color: var(--home-muted);
+}
+
 .heroNow,
 .sectionAction {
   font-family: var(--font-family-mono);
@@ -167,9 +174,10 @@
   width: 115px;
   font-family: var(--home-display-font);
   font-size: 28px;
+  font-style: normal;
   font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
+  line-height: normal;
+  color: #0f0f16;
 }
 
 .heroTagline {
@@ -198,18 +206,30 @@
 }
 
 .dividerWrap {
-  padding: 0 16px;
+  padding: 0;
+}
+
+.backgroundSection + .dividerWrap {
+  margin-top: -40px;
 }
 
 .divider {
+  position: relative;
+  box-sizing: border-box;
   height: 12px;
   border-top: 1px solid var(--home-border);
   border-bottom: 1px solid var(--home-border);
-  background-image: url("/figma/home/divider-mobile.png");
-  background-repeat: repeat;
-  background-position: top left;
-  background-size: 6px 6px;
-  opacity: 0.8;
+  overflow: hidden;
+}
+
+.dividerPattern {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  color: var(--home-border);
+  pointer-events: none;
 }
 
 .section {
@@ -382,7 +402,7 @@
 .backgroundSection {
   padding-left: 0;
   padding-right: 0;
-  padding-bottom: 20px;
+  padding-bottom: 0;
 }
 
 .backgroundTimeline {
@@ -396,7 +416,7 @@
 .backgroundLead {
   display: flex;
   align-items: stretch;
-  gap: 2px;
+  gap: 4px;
   flex: 0 0 auto;
   overflow: visible;
 }
@@ -485,6 +505,10 @@
   gap: 8px;
 }
 
+.backgroundNestedEntries .backgroundEntry:last-child {
+  padding-bottom: 20px;
+}
+
 .backgroundEntryMeta {
   display: flex;
   align-items: flex-start;
@@ -518,11 +542,13 @@
   display: flex;
   flex-direction: column;
   gap: 28px;
-  padding-bottom: 20px;
+  padding-bottom: 0;
 }
 
 .footer {
-  display: none;
+  display: block;
+  margin-top: -1px;
+  border-top: 1px solid var(--home-border);
 }
 
 .footerInner {
@@ -536,6 +562,9 @@
 }
 
 .footerCopy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-family: var(--home-display-font);
   font-size: 12px;
   line-height: 21.36px;
@@ -558,6 +587,8 @@
 }
 
 .footerLink {
+  display: inline-flex;
+  align-items: center;
   color: inherit;
   text-decoration: none;
 }
@@ -567,6 +598,7 @@
 }
 
 .xIcon {
+  display: inline-flex;
   position: relative;
   width: 12px;
   height: 12px;
@@ -629,6 +661,10 @@
     padding-left: 0;
   }
 
+  .dividerWrap {
+    padding: 0 16px;
+  }
+
   .sidebar {
     top: 0;
     bottom: 78px;
@@ -651,17 +687,10 @@
     gap: 32px;
   }
 
-  .heroTitle {
-    font-weight: 400;
-  }
-
   .heroTagline {
     flex: 1 1 auto;
     text-align: right;
-  }
-
-  .divider {
-    background-image: url("/figma/home/divider-desktop.png");
+    transform: translateY(-2px);
   }
 
   .pinPartA {
@@ -672,8 +701,4 @@
     background-image: url("/figma/home/pin-desktop-b.svg");
   }
 
-  .footer {
-    display: block;
-    border-top: 1px solid var(--home-border);
-  }
 }

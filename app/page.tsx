@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useId } from "react";
 import InteractiveRuler from "./components/InteractiveRuler";
+import MobileHeader from "./components/MobileHeader";
 import { getAllNotes } from "./lib/notes";
 import styles from "./page.module.css";
 
@@ -84,12 +85,12 @@ function XIcon() {
   );
 }
 
-function Divider() {
+function Divider({ className }: { className?: string }) {
   const patternId = useId();
   const clipId = useId();
 
   return (
-    <div className={styles.dividerWrap} aria-hidden="true">
+    <div className={`${styles.dividerWrap} ${className ?? ""}`.trim()} aria-hidden="true">
       <div className={styles.divider}>
         <svg className={styles.dividerPattern} width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -167,28 +168,14 @@ export default function HomePage() {
             <span className={styles.navItem}>/readme</span>
           </nav>
         </div>
-        <div className={styles.brandRow}>
-          <Link href="/" className={styles.brand}>
-            <span>Ankit </span>
-            <span className={styles.brandMuted}>Mandal</span>
-          </Link>
-        </div>
-        <div className={styles.mobileNavRow}>
-          <nav className={styles.mobileNav} aria-label="Primary">
-            <span className={styles.navItem}>/work</span>
-            <Link href="/notes" className={styles.inactiveLink}>
-              /notes
-            </Link>
-            <span className={styles.navItem}>/readme</span>
-          </nav>
-        </div>
+        <MobileHeader />
       </header>
 
       <div className={styles.pageBody}>
         <InteractiveRuler labels={sidebarLabels} />
 
         <div className={styles.main} data-ruler-content="main">
-          <section className={styles.hero} data-ruler-track>
+          <section className={styles.hero} data-ruler-track data-hero-section>
             <div className={styles.heroTop}>
               <h1 className={styles.heroTitle}>
                 Hey,
@@ -323,7 +310,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <Divider />
+          <Divider className={styles.footerDivider} />
         </div>
 
         <footer className={styles.footer} data-ruler-track>

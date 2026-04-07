@@ -26,7 +26,7 @@ type ButtonProps = {
     const variants: Record<string, React.CSSProperties> = {
       primary: {
         background: "var(--color-accent)",
-        color: "#ffffff",
+        color: "var(--site-header-bg)",
       },
       secondary: {
         background: "transparent",

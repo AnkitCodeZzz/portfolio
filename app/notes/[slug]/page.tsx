@@ -1,8 +1,19 @@
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
-import Container from "../../components/Container";
+import Divider from "../../components/Divider";
+import PageFrame from "../../components/PageFrame";
 import { getAllNotes, getNote } from "../../lib/notes";
+import editorial from "../../styles/editorial.module.css";
+import homeStyles from "../../page.module.css";
+
+const tagClasses = [
+  homeStyles.tagOlive,
+  homeStyles.tagViolet,
+  homeStyles.tagBlue,
+  homeStyles.tagBrown,
+  homeStyles.tagRose,
+];
 
 export function generateStaticParams() {
   return getAllNotes().map((note) => ({ slug: note.slug }));
@@ -15,72 +26,46 @@ export default async function NotePage({
 }) {
   const { slug } = await params;
   const note = getNote(slug);
-  if (!note) notFound();
+
+  if (!note) {
+    notFound();
+  }
 
   return (
-    <main style={{ paddingTop: "var(--spacing-4xl)", paddingBottom: "var(--spacing-4xl)" }}>
-      <Container size="md">
-        {/* Header */}
-        <div style={{ marginBottom: "var(--spacing-2xl)" }}>
-          <span
-            style={{
-              fontFamily: "var(--font-family-ui)",
-              fontSize: "var(--font-size-sm)",
-              color: "var(--ink-40)",
-            }}
-          >
-            {note.date}
-          </span>
-          <h1
-            style={{
-              fontSize: "32px",
-              letterSpacing: "-0.02em",
-              fontWeight: 300,
-              lineHeight: 1.1,
-              fontVariationSettings: "'opsz' 144",
-              fontFamily: "var(--font-family-display)",
-              color: "var(--color-text-primary)",
-              margin: "var(--spacing-xs) 0 0",
-            }}
-          >
-            {note.title}
-          </h1>
-          {note.tags.length > 0 && (
-            <div style={{ marginTop: "var(--spacing-sm)", display: "flex", gap: "6px" }}>
-              {note.tags.map((tag) => (
-                <span
-                  key={tag}
-                  style={{
-                    display: "inline-block",
-                    background: "var(--color-accent-bg)",
-                    color: "var(--color-accent)",
-                    fontFamily: "var(--font-family-ui)",
-                    fontSize: "10px",
-                    padding: "2px 8px",
-                    borderRadius: 0,
-                    textTransform: "uppercase",
-                    letterSpacing: "var(--letter-spacing-tag)",
-                    border: "1px solid color-mix(in srgb, var(--color-accent) 30%, transparent)",
-                  }}
-                >
-                  {tag}
-                </span>
-              ))}
+    <PageFrame>
+      <section className={editorial.detailHeader} data-ruler-track>
+        <div className={editorial.detailBlock}>
+          <span className={editorial.eyebrow}>/notes</span>
+          <div className={editorial.detailCopy}>
+            <div className={editorial.detailMeta}>
+              <span className={editorial.date}>{note.date}</span>
+              {note.tags.length > 0 ? (
+                <div className={editorial.tagRow}>
+                  {note.tags.map((tag, tagIndex) => (
+                    <span key={`${note.slug}-${tag}`}>
+                      <span className={`${editorial.tag} ${tagClasses[tagIndex % tagClasses.length]}`}>{tag}</span>
+                      {tagIndex < note.tags.length - 1 ? <span className={homeStyles.dot}>•</span> : null}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
             </div>
-          )}
-          <div
-            style={{
-              marginTop: "var(--spacing-xl)",
-              borderBottom: "1px solid var(--color-border)",
-            }}
-          />
-        </div>
 
-        {/* MDX content */}
-        <div className="prose">
-          <MDXRemote source={note.content} options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }} />
+            <h1 className={editorial.detailTitle}>{note.title}</h1>
+            {note.description ? <p className={editorial.detailDescription}>{note.description}</p> : null}
+          </div>
         </div>
-      </Container>
-    </main>
+      </section>
+
+      <Divider />
+
+      <section className={editorial.contentSection} data-ruler-track>
+        <div className={editorial.proseWrap}>
+          <div className="prose">
+            <MDXRemote source={note.content} options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }} />
+          </div>
+        </div>
+      </section>
+    </PageFrame>
   );
 }

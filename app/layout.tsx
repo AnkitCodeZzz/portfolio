@@ -23,7 +23,7 @@ const geistMono = Geist_Mono({
 const stackSansNotch = Stack_Sans_Notch({
   variable: "--font-stack-sans-notch",
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["300", "400", "500"],
 });
 
 export const metadata: Metadata = {

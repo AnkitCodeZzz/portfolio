@@ -12,6 +12,11 @@ type ContributionGraphProps = {
   startDate: string;
 };
 
+const GRAPH_CELL_SIZE = 14;
+const GRAPH_CELL_GAP = 3;
+const TOOLTIP_OFFSET = 8;
+const LEGEND_SWATCH_SIZE = 10;
+
 function toLocalDateStr(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
@@ -66,8 +71,8 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
   const today = new Date();
   today.setHours(23, 59, 59, 999);
 
-  const squareSize = 14;
-  const gap = 3;
+  const squareSize = GRAPH_CELL_SIZE;
+  const gap = GRAPH_CELL_GAP;
   const numWeeks = Math.max(1, Math.floor(containerWidth / (squareSize + gap)));
   const weeks = getWeeksGrid(start, numWeeks);
 
@@ -85,7 +90,7 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
     const containerRect = containerRef.current.getBoundingClientRect();
     const tooltipWidth = tooltipEl.offsetWidth;
     const tooltipHeight = tooltipEl.offsetHeight;
-    const gap = 8;
+    const gap = TOOLTIP_OFFSET;
 
     // Default: above the square
     let top = tooltipData.squareTop - tooltipHeight - gap;
@@ -123,9 +128,9 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
 
   return (
     <div ref={containerRef} style={{ width: "100%", overflowX: "hidden", position: "relative" }}>
-      <div style={{ display: "flex", gap: "3px" }}>
+      <div style={{ display: "flex", gap: `${GRAPH_CELL_GAP}px` }}>
         {weeks.map((week, weekIndex) => (
-          <div key={weekIndex} style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+          <div key={weekIndex} style={{ display: "flex", flexDirection: "column", gap: `${GRAPH_CELL_GAP}px` }}>
             {week.map((day, dayIndex) => {
               const dayStr = toLocalDateStr(day);
               const isBeforeStart = dayStr < toLocalDateStr(start);
@@ -158,8 +163,8 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
                     setTooltipPos({ top: 0, left: 0, ready: false });
                   }}
                   style={{
-                    width: "14px",
-                    height: "14px",
+                    width: `${GRAPH_CELL_SIZE}px`,
+                    height: `${GRAPH_CELL_SIZE}px`,
                     borderRadius: "var(--radius-sm)",
                     background,
                     border,
@@ -183,10 +188,10 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
             left: `${tooltipPos.left}px`,
             visibility: tooltipPos.ready ? "visible" : "hidden",
             background: "var(--color-ink)",
-            color: "#fff",
+            color: "var(--site-header-bg)",
             fontSize: "var(--font-size-xs)",
             fontFamily: "var(--font-family-ui)",
-            padding: "4px 8px",
+            padding: "var(--spacing-xs) var(--spacing-sm)",
             borderRadius: "var(--radius-sm)",
             whiteSpace: "nowrap",
             pointerEvents: "none",
@@ -206,16 +211,16 @@ export default function ContributionGraph({ logs, startDate }: ContributionGraph
           alignItems: "center",
         }}
       >
-        <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
-          <div style={{ width: "10px", height: "10px", borderRadius: "2px", background: "var(--color-accent)" }} />
+        <div style={{ display: "flex", gap: "var(--site-space-meta-gap)", alignItems: "center" }}>
+          <div style={{ width: `${LEGEND_SWATCH_SIZE}px`, height: `${LEGEND_SWATCH_SIZE}px`, borderRadius: "var(--spacing-2xs)", background: "var(--color-accent)" }} />
           <span style={{ fontSize: "var(--font-size-xs)", color: "var(--color-text-muted)", fontFamily: "var(--font-family-ui)" }}>Active</span>
         </div>
-        <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
-          <div style={{ width: "10px", height: "10px", borderRadius: "2px", border: "1px solid var(--color-border)" }} />
+        <div style={{ display: "flex", gap: "var(--site-space-meta-gap)", alignItems: "center" }}>
+          <div style={{ width: `${LEGEND_SWATCH_SIZE}px`, height: `${LEGEND_SWATCH_SIZE}px`, borderRadius: "var(--spacing-2xs)", border: "1px solid var(--color-border)" }} />
           <span style={{ fontSize: "var(--font-size-xs)", color: "var(--color-text-muted)", fontFamily: "var(--font-family-ui)" }}>Missed</span>
         </div>
-        <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
-          <div style={{ width: "10px", height: "10px", borderRadius: "2px", background: "var(--color-surface)", border: "1px dashed var(--ink-08)", opacity: 0.5 }} />
+        <div style={{ display: "flex", gap: "var(--site-space-meta-gap)", alignItems: "center" }}>
+          <div style={{ width: `${LEGEND_SWATCH_SIZE}px`, height: `${LEGEND_SWATCH_SIZE}px`, borderRadius: "var(--spacing-2xs)", background: "var(--color-surface)", border: "1px dashed var(--ink-08)", opacity: 0.5 }} />
           <span style={{ fontSize: "var(--font-size-xs)", color: "var(--color-text-muted)", fontFamily: "var(--font-family-ui)" }}>Upcoming</span>
         </div>
       </div>

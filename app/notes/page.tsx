@@ -1,109 +1,79 @@
+import { Fragment } from "react";
 import Link from "next/link";
-import Container from "../components/Container";
-import Typography from "../components/Typography";
+import Divider from "../components/Divider";
+import PageFrame from "../components/PageFrame";
 import { getAllNotes } from "../lib/notes";
+import editorial from "../styles/editorial.module.css";
+import homeStyles from "../page.module.css";
+
+const tagClasses = [
+  homeStyles.tagOlive,
+  homeStyles.tagViolet,
+  homeStyles.tagBlue,
+  homeStyles.tagBrown,
+  homeStyles.tagRose,
+];
 
 export default function NotesPage() {
   const notes = getAllNotes();
 
   return (
-    <main style={{ paddingTop: "var(--spacing-4xl)", paddingBottom: "var(--spacing-4xl)" }}>
-      <Container size="md">
-        <h1
-          style={{
-            fontSize: "32px",
-            letterSpacing: "-0.02em",
-            fontWeight: 300,
-            lineHeight: 1.1,
-            fontVariationSettings: "'opsz' 144",
-            fontFamily: "var(--font-family-display)",
-            color: "var(--color-text-primary)",
-            margin: 0,
-          }}
-        >
-          Notes
-        </h1>
-        <div style={{ marginTop: "var(--spacing-sm)" }}>
-          <p
-            style={{
-              fontFamily: "var(--font-family-display)",
-              fontStyle: "italic",
-              fontSize: "17px",
-              fontWeight: 300,
-              color: "var(--ink-40)",
-              lineHeight: 1.35,
-              margin: 0,
-            }}
-          >
-            Thinking out loud — design, craft, and whatever&apos;s on my mind.
-          </p>
+    <PageFrame>
+      <section className={editorial.intro}>
+        <div className={editorial.introBlock} data-ruler-track data-ruler-pad-bottom="56">
+          <span className={editorial.eyebrow}>/notes</span>
+          <div className={editorial.introCopy}>
+            <h1 className={editorial.pageTitle}>Notes</h1>
+            <p className={editorial.pageTagline}>
+              Thinking out loud about design, craft, and the things I&apos;m trying to understand more clearly.
+            </p>
+          </div>
         </div>
+      </section>
 
-        <div style={{ marginTop: "var(--spacing-2xl)" }}>
-          {notes.map((note) => (
-            <Link
-              key={note.slug}
-              href={`/notes/${note.slug}`}
-              style={{ textDecoration: "none", color: "inherit", display: "block" }}
-            >
-              <div
-                style={{
-                  paddingTop: "var(--spacing-lg)",
-                  paddingBottom: "var(--spacing-lg)",
-                  borderBottom: "1px solid var(--color-border)",
-                }}
-              >
-                <Typography as="span" size="sm" color="muted" font="ui">
-                  {note.date}
-                </Typography>
-                <div style={{ marginTop: "var(--spacing-xs)" }}>
-                  <Typography as="h2" size="xl" weight="normal">
-                    {note.title}
-                  </Typography>
-                </div>
-                {note.description && (
-                  <div style={{ marginTop: "var(--spacing-xs)" }}>
-                    <p
-                      style={{
-                        fontFamily: "var(--font-family-body)",
-                        fontSize: "16px",
-                        lineHeight: 1.78,
-                        color: "var(--ink-60)",
-                        margin: 0,
-                      }}
-                    >
-                      {note.description}
-                    </p>
+      <Divider />
+
+      <section className={editorial.section}>
+        <div className={editorial.sectionBlock}>
+          {notes.length === 0 ? (
+            <p className={editorial.emptyState} data-ruler-track>
+              No notes published yet.
+            </p>
+          ) : (
+            <div className={editorial.list}>
+              {notes.map((note) => (
+                <article
+                  key={note.slug}
+                  className={editorial.listItem}
+                  data-ruler-track
+                  data-ruler-pad-top="24"
+                  data-ruler-pad-bottom="40"
+                >
+                  <div className={editorial.metaCluster}>
+                    <span className={editorial.date}>{note.date}</span>
+                    {note.tags.length > 0 ? (
+                      <div className={editorial.tagRow}>
+                        {note.tags.map((tag, tagIndex) => (
+                          <Fragment key={`${note.slug}-${tag}`}>
+                            <span className={`${editorial.tag} ${tagClasses[tagIndex % tagClasses.length]}`}>{tag}</span>
+                            {tagIndex < note.tags.length - 1 ? <span className={homeStyles.dot}>•</span> : null}
+                          </Fragment>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
-                )}
-                {note.tags.length > 0 && (
-                  <div style={{ marginTop: "var(--spacing-sm)", display: "flex", gap: "6px" }}>
-                    {note.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        style={{
-                          display: "inline-block",
-                          background: "var(--color-accent-bg)",
-                          color: "var(--color-accent)",
-                          fontFamily: "var(--font-family-ui)",
-                          fontSize: "10px",
-                          padding: "2px 8px",
-                          borderRadius: 0,
-                          textTransform: "uppercase",
-                          letterSpacing: "var(--letter-spacing-tag)",
-                          border: "1px solid color-mix(in srgb, var(--color-accent) 30%, transparent)",
-                        }}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </Link>
-          ))}
+
+                  <Link href={`/notes/${note.slug}`} className={editorial.entryLink}>
+                    <h2 className={editorial.entryTitle}>{note.title}</h2>
+                  </Link>
+
+                  {note.description ? <p className={editorial.entryDescription}>{note.description}</p> : null}
+                </article>
+              ))}
+            </div>
+          )}
         </div>
-      </Container>
-    </main>
+      </section>
+    </PageFrame>
   );
 }

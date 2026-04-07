@@ -9,7 +9,7 @@ type ContainerProps = {
   }: ContainerProps) {
     const maxWidths = {
       sm: "640px",
-      md: "768px",
+      md: "var(--site-content-max)",
       lg: "1024px",
     };
   

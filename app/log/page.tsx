@@ -1,45 +1,48 @@
-import Typography from "../components/Typography";
-import Container from "../components/Container";
 import ContributionGraph from "../components/ContributionGraph";
+import Divider from "../components/Divider";
+import PageFrame from "../components/PageFrame";
 import { logs } from "../lib/logs";
+import editorial from "../styles/editorial.module.css";
 
 export default function BuildLog() {
+  const entries = [...logs].reverse();
+
   return (
-    <main style={{ paddingTop: "var(--spacing-4xl)", paddingBottom: "var(--spacing-4xl)" }}>
-      <Container size="md">
-        <Typography as="h1" size="4xl" weight="bold" font="display">
-          Build Log
-        </Typography>
-        <div style={{ marginTop: "var(--spacing-sm)" }}>
-          <Typography as="p" size="lg" color="secondary">
-            A public record of building this site from scratch — learning design engineering along the way.
-          </Typography>
+    <PageFrame>
+      <section className={editorial.intro} data-ruler-track>
+        <div className={editorial.introBlock}>
+          <span className={editorial.eyebrow}>/log</span>
+          <div className={editorial.introCopy}>
+            <h1 className={editorial.pageTitle}>Build Log</h1>
+            <p className={editorial.pageTagline}>
+              A public record of building this site from scratch and learning design engineering along the way.
+            </p>
+          </div>
         </div>
-        <div style={{ marginTop: "var(--spacing-2xl)" }}>
+      </section>
+
+      <Divider />
+
+      <section className={editorial.graphSection} data-ruler-track>
+        <div className={editorial.graphBlock}>
           <ContributionGraph logs={logs} startDate="March 8, 2026" />
         </div>
-        <div style={{ marginTop: "var(--spacing-2xl)" }}>
-          {[...logs].reverse().map((log, index) => (
-            <div
-              key={index}
-              style={{
-                paddingTop: "var(--spacing-lg)",
-                paddingBottom: "var(--spacing-lg)",
-                borderBottom: "1px solid var(--color-border)",
-              }}
-            >
-              <Typography as="span" size="sm" color="muted" font="ui">
-                {log.date}
-              </Typography>
-              <div style={{ marginTop: "var(--spacing-xs)" }}>
-                <Typography as="p" size="base">
-                  {log.entry}
-                </Typography>
-              </div>
-            </div>
-          ))}
+      </section>
+
+      <Divider />
+
+      <section className={editorial.section} data-ruler-track>
+        <div className={editorial.sectionBlock}>
+          <div className={editorial.list}>
+            {entries.map((log, index) => (
+              <article key={`${log.date}-${index}`} className={editorial.listItem}>
+                <span className={editorial.date}>{log.date}</span>
+                <p className={editorial.logEntry}>{log.entry}</p>
+              </article>
+            ))}
+          </div>
         </div>
-      </Container>
-    </main>
+      </section>
+    </PageFrame>
   );
 }

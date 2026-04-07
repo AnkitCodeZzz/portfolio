@@ -14,6 +14,9 @@ type InteractiveRulerProps = {
   labels: string[];
 };
 
+const MOBILE_CENTER_RATIO = 0.5;
+const MOBILE_HYSTERESIS_PX = 48;
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
@@ -35,6 +38,17 @@ function unionClientRects(rects: DOMRectList | DOMRect[]) {
   }
 
   return { top, bottom };
+}
+
+function getNumericAttribute(element: HTMLElement, name: string) {
+  const rawValue = element.dataset[name];
+
+  if (!rawValue) {
+    return 0;
+  }
+
+  const parsedValue = Number.parseFloat(rawValue);
+  return Number.isFinite(parsedValue) ? parsedValue : 0;
 }
 
 export default function InteractiveRuler({ labels }: InteractiveRulerProps) {
@@ -118,27 +132,45 @@ export default function InteractiveRuler({ labels }: InteractiveRulerProps) {
         return;
       }
 
-      const viewportCenter = viewportTop + viewportHeight * 0.5;
       const visibleSections = trackedSections
         .map((section, index) => {
           const rect = section.getBoundingClientRect();
-          const visibleTop = Math.max(rect.top, viewportTop);
-          const visibleBottom = Math.min(rect.bottom, viewportBottom);
+          const padTop = getNumericAttribute(section, "rulerPadTop");
+          const padBottom = getNumericAttribute(section, "rulerPadBottom");
+          const activationTop = rect.top - padTop;
+          const activationBottom = rect.bottom + padBottom;
+          const visibleTop = Math.max(activationTop, viewportTop);
+          const visibleBottom = Math.min(activationBottom, viewportBottom);
           const visibleHeight = visibleBottom - visibleTop;
 
           if (visibleHeight <= 0) {
             return null;
           }
 
-          const center = rect.top + rect.height / 2;
+          const center = activationTop + (activationBottom - activationTop) / 2;
 
           return {
             index,
             rect,
-            distance: Math.abs(center - viewportCenter),
+            activationTop,
+            activationBottom,
+            visibleHeight,
+            distance: Math.abs(center - (viewportTop + viewportHeight * MOBILE_CENTER_RATIO)),
           };
         })
-        .filter((section): section is { index: number; rect: DOMRect; distance: number } => section !== null);
+        .filter(
+          (
+            section
+          ): section is {
+            index: number;
+            rect: DOMRect;
+            activationTop: number;
+            activationBottom: number;
+            visibleHeight: number;
+            distance: number;
+          } =>
+            section !== null
+        );
 
       if (visibleSections.length === 0) {
         setHighlight((current) => (current.visible ? { visible: false, top: 0, height: 0 } : current));
@@ -157,7 +189,7 @@ export default function InteractiveRuler({ labels }: InteractiveRulerProps) {
       if (
         currentSection &&
         nextSection.index !== currentSection.index &&
-        nextSection.distance > currentSection.distance - 48
+        nextSection.distance > currentSection.distance - MOBILE_HYSTERESIS_PX
       ) {
         nextSection = currentSection;
       }

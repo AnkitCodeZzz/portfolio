@@ -1,89 +1,173 @@
 :root {
-    /* ==================== SPACING ==================== */
-    /* Based on 4px grid — this scale rarely changes */
-    --spacing-xs: 4px;
-    --spacing-sm: 8px;
-    --spacing-md: 16px;
-    --spacing-lg: 24px;
-    --spacing-xl: 32px;
-    --spacing-2xl: 48px;
-    --spacing-3xl: 64px;
-    --spacing-4xl: 96px;
-  
-    /* ==================== TYPOGRAPHY ==================== */
-    /* Sizes — modular scale, will swap font-family later */
-    --font-family-display: 'Fraunces', Georgia, serif;
-    --font-family-body: var(--font-lora, "Lora"), Georgia, serif;
-    --font-family-ui: var(--font-geist, "Geist"), system-ui, sans-serif;
-    --font-family-mono: var(--font-geist-mono, "Geist Mono"), ui-monospace, monospace;
-  
-    --font-size-xs: 0.75rem;    /* 12px */
-    --font-size-sm: 0.875rem;   /* 14px */
-    --font-size-base: 1rem;     /* 16px */
-    --font-size-lg: 1.125rem;   /* 18px */
-    --font-size-xl: 1.25rem;    /* 20px */
-    --font-size-2xl: 1.5rem;    /* 24px */
-    --font-size-3xl: 1.875rem;  /* 30px */
-    --font-size-4xl: 2.25rem;   /* 36px */
-    --font-size-5xl: 3rem;      /* 48px */
-  
-    --line-height-tight: 1.2;
-    --line-height-normal: 1.5;
-    --line-height-relaxed: 1.75;
-    --line-height-body: 1.78;
+  /* ==================== SPACING ==================== */
+  --spacing-2xs: 2px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+  --spacing-4xl: 96px;
 
-    --font-weight-light: 300;
-    --font-weight-normal: 400;
-    --font-weight-medium: 500;
-    --font-weight-semibold: 600;
-    --font-weight-bold: 700;
+  /* ==================== TYPOGRAPHY ==================== */
+  --font-family-ui: var(--font-geist, "Geist"), system-ui, sans-serif;
+  --font-family-mono: var(--font-geist-mono, "Geist Mono"), ui-monospace, monospace;
+  --font-family-body: var(--font-lora, "Lora"), Georgia, serif;
+  --font-family-display: var(--font-stack-sans-notch, "Stack Sans Notch"), var(--font-geist, "Geist"), system-ui, sans-serif;
 
-    --letter-spacing-tight: -0.02em;
-    --letter-spacing-wide: 0.1em;
-    --letter-spacing-tag: 0.06em;
-  
-    /* ==================== COLORS ==================== */
-    /* Foundation */
-    --color-bg: #f7f7f5;
-    --color-ink: #0c0c18;
-    --color-surface: #efefed;
-    --color-border: #e2e2df;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
 
-    /* Ink opacity scale — always use ink at opacity, never mix gray */
-    --ink-100: rgba(12, 12, 24, 1.00);
-    --ink-80: rgba(12, 12, 24, 0.80);
-    --ink-60: rgba(12, 12, 24, 0.60);
-    --ink-40: rgba(12, 12, 24, 0.40);
-    --ink-20: rgba(12, 12, 24, 0.20);
-    --ink-08: rgba(12, 12, 24, 0.08);
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --line-height-body: 1.625;
 
-    /* Semantic colors */
-    --color-bg-primary: var(--color-bg);
-    --color-bg-secondary: var(--color-surface);
-    --color-text-primary: var(--ink-100);
-    --color-text-secondary: rgba(12, 12, 24, 0.62);
-    --color-text-muted: var(--ink-40);
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
-    /* Primary accent — Sage */
-    --color-accent: #8fada0;
-    --color-accent-bg: #e6eeea;
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-wide: 0.1em;
+  --letter-spacing-tag: 0.06em;
 
-    /* Category accents */
-    --color-a: #8fada0; --color-a-bg: #e6eeea; /* sage */
-    --color-b: #8fa8c0; --color-b-bg: #e8edf2; /* steel blue */
-    --color-c: #a89cbd; --color-c-bg: #edeaf3; /* dusk violet */
-    --color-d: #a8a090; --color-d-bg: #edeae4; /* warm stone */
-    --color-e: #b09898; --color-e-bg: #f0eaea; /* muted rose */
-  
-    /* ==================== BORDERS ==================== */
-    --radius-sm: 4px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --radius-xl: 16px;
-    --radius-full: 9999px;
-  
-    /* ==================== SHADOWS ==================== */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  }
+  /* ==================== SITE DESIGN LANGUAGE ==================== */
+  --site-content-max: 770px;
+  --site-ruler-width: 20px;
+  --site-ruler-padding-y: 8px;
+  --site-ruler-tick-offset: 2px;
+  --site-sidebar-label-width: 10px;
+  --site-sidebar-label-height: 14px;
+  --site-sidebar-label-size: 8px;
+  --site-sidebar-label-line-height: 9.6px;
+  --site-sidebar-dash-width: 4px;
+  --site-sidebar-dash-height: 1px;
+
+  --site-space-label-gap: 4px;
+  --site-space-copy-offset: 6px;
+  --site-space-entry-gap: 8px;
+  --site-space-inline-compact: 16px;
+  --site-space-inline-desktop: 20px;
+  --site-space-inline-page: 24px;
+  --site-space-header-offset: 44px;
+  --site-space-stack: 28px;
+  --site-space-section: 32px;
+  --site-space-page: 40px;
+  --site-space-footer-y: 28px;
+  --site-space-section-gap: 24px;
+  --site-space-row-gap: 16px;
+  --site-space-divider-inline-desktop: 24px;
+  --site-space-divider-inline-mobile: 0px;
+  --site-space-meta-gap: 8px;
+  --site-space-meta-margin: 8px;
+  --site-space-hero-top: 40px;
+  --site-space-background-inset: 5px;
+  --site-space-background-tail: 20px;
+  --site-space-nav-gap: 20px;
+
+  --site-size-brand-row: 53px;
+  --site-size-mobile-nav-row: 34px;
+  --site-size-divider: 12px;
+  --site-size-pin: 16px;
+  --site-size-footer-icon: 12px;
+  --site-size-background-lead-label: 13px;
+  --site-size-timeline-head-top-width: 7px;
+  --site-size-timeline-head-top-height: 9px;
+  --site-size-timeline-head-bottom-width: 6px;
+  --site-size-timeline-head-bottom-height: 6px;
+  --site-size-timeline-stem: 1px;
+  --site-size-section-title: 24px;
+  --site-size-page-title: 28px;
+  --site-size-entry-title: 17px;
+  --site-size-tagline: 17px;
+  --site-size-body: 16px;
+  --site-size-mono: 14px;
+  --site-size-meta: 12px;
+  --site-size-background-label: 10px;
+  --site-size-brand: 16px;
+  --site-size-hero-width: 115px;
+
+  --site-line-body: 26px;
+  --site-line-footer: 21.36px;
+  --site-line-decoration-offset: 2px;
+
+  --site-shift-highlight-border: -1px;
+  --site-shift-hero-tagline: -2px;
+  --site-overlap-hairline: -1px;
+  --site-timeline-stem-left: -0.5px;
+  --site-space-timeline-top: 8px;
+  --site-space-timeline-bottom: 4px;
+
+  --site-bg: #f5f5f7;
+  --site-panel: #f1f1f3;
+  --site-header-bg: #f9f9fb;
+  --site-border: #d7d7de;
+  --site-ink: #0f0f16;
+  --site-ink-strong: #05050c;
+  --site-muted: #696971;
+  --site-muted-soft: #7d7d84;
+  --site-muted-faint: #c3c3ca;
+  --site-highlight-fill: rgba(47, 128, 255, 0.12);
+  --site-highlight-stroke: rgba(47, 128, 255, 0.32);
+  --site-tag-olive: #869966;
+  --site-tag-violet: #866699;
+  --site-tag-blue: #669999;
+  --site-tag-brown: #998866;
+  --site-tag-rose: #996666;
+  --site-tag-sage: #8fada0;
+
+  /* ==================== COLORS ==================== */
+  --color-bg: var(--site-bg);
+  --color-ink: var(--site-ink);
+  --color-surface: var(--site-panel);
+  --color-border: var(--site-border);
+
+  --ink-100: color-mix(in srgb, var(--site-ink) 100%, transparent);
+  --ink-80: color-mix(in srgb, var(--site-ink) 80%, transparent);
+  --ink-60: color-mix(in srgb, var(--site-ink) 60%, transparent);
+  --ink-40: color-mix(in srgb, var(--site-ink) 40%, transparent);
+  --ink-20: color-mix(in srgb, var(--site-ink) 20%, transparent);
+  --ink-08: color-mix(in srgb, var(--site-ink) 8%, transparent);
+
+  --color-bg-primary: var(--color-bg);
+  --color-bg-secondary: var(--site-panel);
+  --color-text-primary: var(--site-ink);
+  --color-text-secondary: var(--site-muted);
+  --color-text-muted: var(--site-muted-soft);
+
+  --color-accent: var(--site-tag-sage);
+  --color-accent-bg: color-mix(in srgb, var(--site-tag-sage) 18%, white);
+
+  --color-a: var(--site-tag-sage);
+  --color-a-bg: color-mix(in srgb, var(--site-tag-sage) 18%, white);
+  --color-b: var(--site-tag-blue);
+  --color-b-bg: color-mix(in srgb, var(--site-tag-blue) 18%, white);
+  --color-c: var(--site-tag-violet);
+  --color-c-bg: color-mix(in srgb, var(--site-tag-violet) 18%, white);
+  --color-d: var(--site-tag-brown);
+  --color-d-bg: color-mix(in srgb, var(--site-tag-brown) 18%, white);
+  --color-e: var(--site-tag-rose);
+  --color-e-bg: color-mix(in srgb, var(--site-tag-rose) 18%, white);
+
+  /* ==================== BORDERS ==================== */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ==================== SHADOWS ==================== */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+}

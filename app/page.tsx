@@ -1,6 +1,7 @@
+import { Fragment } from "react";
 import Link from "next/link";
-import { useId } from "react";
 import InteractiveRuler from "./components/InteractiveRuler";
+import Divider from "./components/Divider";
 import MobileHeader from "./components/MobileHeader";
 import { getAllNotes } from "./lib/notes";
 import styles from "./page.module.css";
@@ -82,38 +83,6 @@ function XIcon() {
       <span className={styles.xLayerB} />
       <span className={styles.xLayerC} />
     </span>
-  );
-}
-
-function Divider({ className }: { className?: string }) {
-  const patternId = useId();
-  const clipId = useId();
-
-  return (
-    <div className={`${styles.dividerWrap} ${className ?? ""}`.trim()} aria-hidden="true">
-      <div className={styles.divider}>
-        <svg className={styles.dividerPattern} width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern
-              id={patternId}
-              patternUnits="userSpaceOnUse"
-              width="4"
-              height="4"
-              patternTransform="scale(1.5)"
-            >
-              <g clipPath={`url(#${clipId})`}>
-                <path d="M1 -1L5 3" stroke="currentColor" strokeWidth="0.5" />
-                <path d="M-1 1L3 5" stroke="currentColor" strokeWidth="0.5" />
-              </g>
-            </pattern>
-            <clipPath id={clipId}>
-              <rect width="4" height="4" fill="white" />
-            </clipPath>
-          </defs>
-          <rect x="0" y="0" width="100%" height="100%" fill={`url(#${patternId})`} />
-        </svg>
-      </div>
-    </div>
   );
 }
 
@@ -234,16 +203,16 @@ export default function HomePage() {
             <div className={styles.noteList}>
               {notes.map((note, noteIndex) => (
                 <article key={note.slug} className={styles.noteRow}>
-                  <div>
+                  <div className={styles.noteContent}>
                     {note.tags.length > 0 ? (
                       <div className={styles.notesMeta}>
                         {note.tags.map((tag, tagIndex) => (
-                          <span key={`${note.slug}-${tag}`}>
+                          <Fragment key={`${note.slug}-${tag}`}>
                             <span className={`${styles.noteTag} ${noteTagClasses[tagIndex % noteTagClasses.length]}`}>
                               {tag}
                             </span>
                             {tagIndex < note.tags.length - 1 ? <span className={styles.dot}>•</span> : null}
-                          </span>
+                          </Fragment>
                         ))}
                       </div>
                     ) : null}
@@ -312,33 +281,33 @@ export default function HomePage() {
 
           <Divider className={styles.footerDivider} />
         </div>
-
-        <footer className={styles.footer} data-ruler-track>
-          <div className={styles.footerInner}>
-            <span className={styles.footerCopy}>
-              <span>© Ankit Mandal</span>
-              <span className={styles.footerMutedDot}>•</span>
-              <span>{new Date().getFullYear()}</span>
-            </span>
-            <div className={styles.footerLinks}>
-              <a href="https://x.com/Ankit__TwT" target="_blank" rel="noreferrer" className={styles.footerLink}>
-                <XIcon />
-              </a>
-              <span className={styles.footerMutedDot}>•</span>
-              <a
-                href="https://www.linkedin.com/in/itsankitmandal/"
-                target="_blank"
-                rel="noreferrer"
-                className={styles.footerLink}
-              >
-                LinkedIn
-              </a>
-              <span className={styles.footerMutedDot}>•</span>
-              <span>Resume</span>
-            </div>
-          </div>
-        </footer>
       </div>
+
+      <footer className={`${styles.footer} ${styles.footerDocked}`}>
+        <div className={styles.footerInner}>
+          <span className={styles.footerCopy}>
+            <span>© Ankit Mandal</span>
+            <span className={styles.footerMutedDot}>•</span>
+            <span>{new Date().getFullYear()}</span>
+          </span>
+          <div className={styles.footerLinks}>
+            <a href="https://x.com/Ankit__TwT" target="_blank" rel="noreferrer" className={styles.footerLink}>
+              <XIcon />
+            </a>
+            <span className={styles.footerMutedDot}>•</span>
+            <a
+              href="https://www.linkedin.com/in/itsankitmandal/"
+              target="_blank"
+              rel="noreferrer"
+              className={styles.footerLink}
+            >
+              LinkedIn
+            </a>
+            <span className={styles.footerMutedDot}>•</span>
+            <span>Resume</span>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

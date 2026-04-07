@@ -24,6 +24,7 @@ const stackSansNotch = Stack_Sans_Notch({
   variable: "--font-stack-sans-notch",
   subsets: ["latin"],
   weight: ["300", "400", "500"],
+  adjustFontFallback: false,
 });
 
 export const metadata: Metadata = {

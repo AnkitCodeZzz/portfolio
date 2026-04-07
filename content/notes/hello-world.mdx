@@ -2,7 +2,60 @@
 title: "Hello World"
 date: "March 17, 2026"
 tags: ["update"]
-description: "My first note — testing the blog system."
+description: "A longer placeholder note for testing the single-note reading experience."
 ---
 
-This is my first note. The blog system is working.
+This is a longer placeholder note for testing how the single-note page behaves once there is enough reading depth to scroll through. I mainly want to see whether the ruler highlight feels stable while moving between the note header and the body content.
+
+I also want to make sure the prose rhythm still feels right with **bold text**, *italic emphasis*, [a simple link](https://ankitmandal.tech), and a little bit of `inline code` inside a sentence.
+
+## Why I am testing this
+
+When a note is very short, it is hard to tell whether the ruler behavior is actually good or whether the page just does not have enough vertical space to reveal the interaction clearly. A longer entry makes it easier to notice where the highlight switches, how long it stays active, and whether the spacing still feels intentional.
+
+### A smaller checkpoint
+
+The goal here is not the writing itself. The goal is to create enough content to test the layout, scrolling, and MDX rendering with the same design language the homepage is already using.
+
+## A few things I want to observe
+
+- Whether the note header owns the ruler highlight for long enough
+- Whether the content section takes over cleanly once I scroll into the body
+- Whether longer prose still feels balanced inside the same container
+- Whether small typographic details stay consistent on both desktop and mobile
+
+1. Scroll into the note slowly
+2. Watch where the highlight switches
+3. Check if the transition feels calm rather than twitchy
+
+## A short quote
+
+> Good interfaces often feel quiet because the underlying structure is doing its job.
+
+That idea is useful here too. If the ruler interaction is working well, I should not have to think about it much. It should simply feel attached to the page in the same way the rest of the layout does.
+
+## A tiny code block
+
+```js
+const rulerTest = {
+  mode: "mobile",
+  interaction: "section-based",
+  status: "observing",
+};
+```
+
+The code is not important, but the block helps confirm that longer MDX content still sits nicely in the reading column and that the body section has enough real depth for interaction testing.
+
+## A small image
+
+![Next.js logo](/next.svg)
+
+## A divider for testing
+
+---
+
+After a divider, the page should still feel continuous. I want to make sure the note does not suddenly feel like a different template once it starts mixing a few MDX elements together.
+
+## Closing notes
+
+This entry is still placeholder content, but it is useful placeholder content. It gives us enough paragraphs, structure, and vertical length to test the note page in a way that a one-line post never could.

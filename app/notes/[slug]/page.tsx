@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
-import Divider from "../../components/Divider";
+import Breadcrumbs from "../../components/Breadcrumbs";
 import PageFrame from "../../components/PageFrame";
+import { splitMdxIntoSections } from "../../lib/mdxSections";
 import { getAllNotes, getNote } from "../../lib/notes";
 import editorial from "../../styles/editorial.module.css";
 import homeStyles from "../../page.module.css";
@@ -31,41 +32,58 @@ export default async function NotePage({
     notFound();
   }
 
+  const contentSections = splitMdxIntoSections(note.content);
+
   return (
     <PageFrame>
       <section className={editorial.detailHeader} data-ruler-track>
         <div className={editorial.detailBlock}>
-          <span className={editorial.eyebrow}>/notes</span>
+          <Breadcrumbs
+            items={[
+              { label: "notes", href: "/notes" },
+              { label: note.title },
+            ]}
+          />
           <div className={editorial.detailCopy}>
-            <div className={editorial.detailMeta}>
-              <span className={editorial.date}>{note.date}</span>
-              {note.tags.length > 0 ? (
-                <div className={editorial.tagRow}>
-                  {note.tags.map((tag, tagIndex) => (
-                    <span key={`${note.slug}-${tag}`}>
-                      <span className={`${editorial.tag} ${tagClasses[tagIndex % tagClasses.length]}`}>{tag}</span>
-                      {tagIndex < note.tags.length - 1 ? <span className={homeStyles.dot}>•</span> : null}
-                    </span>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-
             <h1 className={editorial.detailTitle}>{note.title}</h1>
             {note.description ? <p className={editorial.detailDescription}>{note.description}</p> : null}
           </div>
         </div>
       </section>
 
-      <Divider />
+      <div className={editorial.readingSections}>
+        {contentSections.map((section) => (
+          <section
+            key={section.key}
+            className={`${editorial.contentSection} ${editorial.readingSection}`}
+            data-ruler-track
+          >
+            <div className={editorial.proseWrap}>
+              <div className="prose">
+                <MDXRemote source={section.source} options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }} />
+              </div>
+            </div>
+          </section>
+        ))}
+      </div>
 
-      <section className={editorial.contentSection} data-ruler-track>
-        <div className={editorial.proseWrap}>
-          <div className="prose">
-            <MDXRemote source={note.content} options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }} />
+      {note.tags.length > 0 ? (
+        <section className={`${editorial.contentSection} ${editorial.detailFooterMeta}`}>
+          <div className={editorial.tagRow}>
+            {note.tags.map((tag, tagIndex) => (
+              <span key={`${note.slug}-footer-${tag}`}>
+                <span
+                  data-ruler-tag
+                  className={`${editorial.tag} ${tagClasses[tagIndex % tagClasses.length]}`}
+                >
+                  {tag}
+                </span>
+                {tagIndex < note.tags.length - 1 ? <span className={homeStyles.dot}>•</span> : null}
+              </span>
+            ))}
           </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
     </PageFrame>
   );
 }

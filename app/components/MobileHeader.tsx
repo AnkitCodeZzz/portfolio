@@ -4,7 +4,11 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import styles from "../page.module.css";
 
-export default function MobileHeader() {
+type MobileHeaderProps = {
+  showNav?: boolean;
+};
+
+export default function MobileHeader({ showNav = true }: MobileHeaderProps) {
   const [navHidden, setNavHidden] = useState(false);
   const navHiddenRef = useRef(false);
   const transitionLockUntilRef = useRef(0);
@@ -12,6 +16,10 @@ export default function MobileHeader() {
   const frameRef = useRef(0);
 
   useEffect(() => {
+    if (!showNav) {
+      return;
+    }
+
     const mediaQuery = window.matchMedia("(max-width: 899px)");
 
     const setHiddenState = (nextHidden: boolean) => {
@@ -140,7 +148,7 @@ export default function MobileHeader() {
       window.removeEventListener("touchcancel", handleTouchEnd);
       mediaQuery.removeEventListener("change", handleMediaChange);
     };
-  }, []);
+  }, [showNav]);
 
   return (
     <div className={styles.mobileHeader} data-mobile-nav-hidden={navHidden ? "true" : "false"}>
@@ -150,18 +158,20 @@ export default function MobileHeader() {
           <span className={styles.brandMuted}>Mandal</span>
         </Link>
       </div>
-      <div className={styles.mobileNavShell}>
-        <div className={styles.mobileNavRow}>
-          <div className={styles.mobileNavRuler} aria-hidden="true" />
-          <nav className={styles.mobileNav} aria-label="Primary">
-            <span className={styles.navItem}>/work</span>
-            <Link href="/notes" className={styles.inactiveLink}>
-              /notes
-            </Link>
-            <span className={styles.navItem}>/readme</span>
-          </nav>
+      {showNav ? (
+        <div className={styles.mobileNavShell}>
+          <div className={styles.mobileNavRow}>
+            <div className={styles.mobileNavRuler} aria-hidden="true" />
+            <nav className={styles.mobileNav} aria-label="Primary">
+              <span className={`${styles.navItem} ${styles.navWork}`}>/work</span>
+              <Link href="/notes" className={`${styles.inactiveLink} ${styles.navNotes}`}>
+                /notes
+              </Link>
+              <span className={`${styles.navItem} ${styles.navReadme}`}>/readme</span>
+            </nav>
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }

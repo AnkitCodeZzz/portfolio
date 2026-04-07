@@ -19,9 +19,8 @@ export default function NotesPage() {
 
   return (
     <PageFrame>
-      <section className={editorial.intro}>
-        <div className={editorial.introBlock} data-ruler-track data-ruler-pad-bottom="56">
-          <span className={editorial.eyebrow}>/notes</span>
+      <section className={homeStyles.hero} data-ruler-track>
+        <div className={editorial.introBlock}>
           <div className={editorial.introCopy}>
             <h1 className={editorial.pageTitle}>Notes</h1>
             <p className={editorial.pageTagline}>
@@ -33,46 +32,40 @@ export default function NotesPage() {
 
       <Divider />
 
-      <section className={editorial.section}>
-        <div className={editorial.sectionBlock}>
-          {notes.length === 0 ? (
-            <p className={editorial.emptyState} data-ruler-track>
-              No notes published yet.
-            </p>
-          ) : (
-            <div className={editorial.list}>
-              {notes.map((note) => (
-                <article
-                  key={note.slug}
-                  className={editorial.listItem}
-                  data-ruler-track
-                  data-ruler-pad-top="24"
-                  data-ruler-pad-bottom="40"
-                >
-                  <div className={editorial.metaCluster}>
-                    <span className={editorial.date}>{note.date}</span>
-                    {note.tags.length > 0 ? (
-                      <div className={editorial.tagRow}>
-                        {note.tags.map((tag, tagIndex) => (
-                          <Fragment key={`${note.slug}-${tag}`}>
-                            <span className={`${editorial.tag} ${tagClasses[tagIndex % tagClasses.length]}`}>{tag}</span>
-                            {tagIndex < note.tags.length - 1 ? <span className={homeStyles.dot}>•</span> : null}
-                          </Fragment>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
+      <section className={homeStyles.section} data-ruler-track>
+        {notes.length === 0 ? (
+          <p className={editorial.emptyState}>
+            No notes published yet.
+          </p>
+        ) : (
+          <div className={homeStyles.noteList}>
+            {notes.map((note) => (
+              <article key={note.slug} className={homeStyles.noteRow}>
+                <div className={homeStyles.noteContent}>
+                  {note.tags.length > 0 ? (
+                    <div className={homeStyles.notesMeta}>
+                      {note.tags.map((tag, tagIndex) => (
+                        <Fragment key={`${note.slug}-${tag}`}>
+                          <span
+                            data-ruler-tag
+                            className={`${homeStyles.noteTag} ${tagClasses[tagIndex % tagClasses.length]}`}
+                          >
+                            {tag}
+                          </span>
+                          {tagIndex < note.tags.length - 1 ? <span className={homeStyles.dot}>•</span> : null}
+                        </Fragment>
+                      ))}
+                    </div>
+                  ) : null}
 
-                  <Link href={`/notes/${note.slug}`} className={editorial.entryLink}>
-                    <h2 className={editorial.entryTitle}>{note.title}</h2>
+                  <Link href={`/notes/${note.slug}`} className={homeStyles.noteTitleLink}>
+                    <h2 className={homeStyles.noteTitle}>{note.title}</h2>
                   </Link>
-
-                  {note.description ? <p className={editorial.entryDescription}>{note.description}</p> : null}
-                </article>
-              ))}
-            </div>
-          )}
-        </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
     </PageFrame>
   );

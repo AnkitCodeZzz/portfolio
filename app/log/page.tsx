@@ -1,4 +1,5 @@
 import ContributionGraph from "../components/ContributionGraph";
+import Breadcrumbs from "../components/Breadcrumbs";
 import Divider from "../components/Divider";
 import PageFrame from "../components/PageFrame";
 import { logs } from "../lib/logs";
@@ -11,7 +12,12 @@ export default function BuildLog() {
     <PageFrame>
       <section className={editorial.intro} data-ruler-track>
         <div className={editorial.introBlock}>
-          <span className={editorial.eyebrow}>/log</span>
+          <Breadcrumbs
+            items={[
+              { label: "home", href: "/" },
+              { label: "log" },
+            ]}
+          />
           <div className={editorial.introCopy}>
             <h1 className={editorial.pageTitle}>Build Log</h1>
             <p className={editorial.pageTagline}>

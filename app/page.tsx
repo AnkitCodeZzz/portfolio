@@ -65,23 +65,11 @@ const noteTagClasses = [
   styles.tagRose,
 ];
 
-const sidebarLabels = Array.from({ length: 11 }, (_, index) => `${index * 100}`);
-
 function PinIcon() {
   return (
     <span className={styles.pin} aria-hidden="true">
       <span className={styles.pinPartA} />
       <span className={styles.pinPartB} />
-    </span>
-  );
-}
-
-function XIcon() {
-  return (
-    <span className={styles.xIcon} aria-hidden="true">
-      <span className={styles.xLayerA} />
-      <span className={styles.xLayerB} />
-      <span className={styles.xLayerC} />
     </span>
   );
 }
@@ -130,18 +118,18 @@ export default function HomePage() {
             <span className={styles.brandMuted}>Mandal</span>
           </Link>
           <nav className={styles.desktopNav} aria-label="Primary">
-            <span className={styles.navItem}>/work</span>
-            <Link href="/notes" className={styles.inactiveLink}>
+            <span className={`${styles.navItem} ${styles.navWork}`}>/work</span>
+            <Link href="/notes" className={`${styles.inactiveLink} ${styles.navNotes}`}>
               /notes
             </Link>
-            <span className={styles.navItem}>/readme</span>
+            <span className={`${styles.navItem} ${styles.navReadme}`}>/readme</span>
           </nav>
         </div>
         <MobileHeader />
       </header>
 
       <div className={styles.pageBody}>
-        <InteractiveRuler labels={sidebarLabels} />
+        <InteractiveRuler />
 
         <div className={styles.main} data-ruler-content="main">
           <section className={styles.hero} data-ruler-track data-hero-section>
@@ -178,7 +166,9 @@ export default function HomePage() {
                 <article key={project.title} className={styles.projectRow}>
                   <div>
                     <div className={styles.entryMeta}>
-                      <span className={`${styles.entryLabel} ${project.labelClassName}`}>{project.label}</span>
+                      <span data-ruler-tag className={`${styles.entryLabel} ${project.labelClassName}`}>
+                        {project.label}
+                      </span>
                     </div>
                     <h3 className={styles.projectTitle}>{project.title}</h3>
                     <p className={styles.projectDescription}>{project.description}</p>
@@ -208,7 +198,10 @@ export default function HomePage() {
                       <div className={styles.notesMeta}>
                         {note.tags.map((tag, tagIndex) => (
                           <Fragment key={`${note.slug}-${tag}`}>
-                            <span className={`${styles.noteTag} ${noteTagClasses[tagIndex % noteTagClasses.length]}`}>
+                            <span
+                              data-ruler-tag
+                              className={`${styles.noteTag} ${noteTagClasses[tagIndex % noteTagClasses.length]}`}
+                            >
                               {tag}
                             </span>
                             {tagIndex < note.tags.length - 1 ? <span className={styles.dot}>•</span> : null}
@@ -249,7 +242,9 @@ export default function HomePage() {
               <div className={styles.backgroundContent}>
                 <article className={styles.backgroundEntry}>
                   <div className={styles.backgroundEntryMeta}>
-                    <span className={styles.backgroundRole}>{backgroundEntries.lead.role}</span>
+                    <span data-ruler-tag className={styles.backgroundRole}>
+                      {backgroundEntries.lead.role}
+                    </span>
                     <span className={styles.backgroundDate}>{backgroundEntries.lead.date}</span>
                   </div>
                   <div>
@@ -264,7 +259,9 @@ export default function HomePage() {
                     {backgroundEntries.rest.map((entry) => (
                       <article key={`${entry.role}-${entry.place}`} className={styles.backgroundEntry}>
                         <div className={styles.backgroundEntryMeta}>
-                          <span className={styles.backgroundRole}>{entry.role}</span>
+                          <span data-ruler-tag className={styles.backgroundRole}>
+                            {entry.role}
+                          </span>
                           <span className={styles.backgroundDate}>{entry.date}</span>
                         </div>
                         <div>
@@ -278,36 +275,8 @@ export default function HomePage() {
               </div>
             </div>
           </section>
-
-          <Divider className={styles.footerDivider} />
         </div>
       </div>
-
-      <footer className={`${styles.footer} ${styles.footerDocked}`}>
-        <div className={styles.footerInner}>
-          <span className={styles.footerCopy}>
-            <span>© Ankit Mandal</span>
-            <span className={styles.footerMutedDot}>•</span>
-            <span>{new Date().getFullYear()}</span>
-          </span>
-          <div className={styles.footerLinks}>
-            <a href="https://x.com/Ankit__TwT" target="_blank" rel="noreferrer" className={styles.footerLink}>
-              <XIcon />
-            </a>
-            <span className={styles.footerMutedDot}>•</span>
-            <a
-              href="https://www.linkedin.com/in/itsankitmandal/"
-              target="_blank"
-              rel="noreferrer"
-              className={styles.footerLink}
-            >
-              LinkedIn
-            </a>
-            <span className={styles.footerMutedDot}>•</span>
-            <span>Resume</span>
-          </div>
-        </div>
-      </footer>
     </main>
   );
 }

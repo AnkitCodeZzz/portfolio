@@ -44,6 +44,8 @@
   /* ==================== SITE DESIGN LANGUAGE ==================== */
   --site-content-max: 770px;
   --site-ruler-width: 20px;
+  --site-ruler-major-step: 100px;
+  --site-ruler-major-label-step: 100;
   --site-ruler-padding-y: 8px;
   --site-ruler-tick-offset: 2px;
   --site-sidebar-label-width: 10px;
@@ -80,6 +82,8 @@
   --site-size-divider: 12px;
   --site-size-pin: 16px;
   --site-size-footer-icon: 12px;
+  --site-size-footer-icon-stroke: 1px;
+  --site-size-footer-icon-stroke-hover: 1.2px;
   --site-size-background-lead-label: 13px;
   --site-size-timeline-head-top-width: 7px;
   --site-size-timeline-head-top-height: 9px;
@@ -100,9 +104,12 @@
   --site-line-body: 26px;
   --site-line-footer: 21.36px;
   --site-line-decoration-offset: 2px;
+  --site-line-link-hover-offset: 3px;
 
   --site-shift-highlight-border: -1px;
   --site-shift-hero-tagline: -2px;
+  --site-shift-link-hover-y: -1px;
+  --site-shift-link-glitch: 1px;
   --site-overlap-hairline: -1px;
   --site-timeline-stem-left: -0.5px;
   --site-space-timeline-top: 8px;
@@ -116,7 +123,13 @@
   --site-ink-strong: #05050c;
   --site-muted: #696971;
   --site-muted-soft: #7d7d84;
+  --site-muted-subtle: #a5a5ac;
   --site-muted-faint: #c3c3ca;
+  --site-link-primary: #7a9640;
+  --site-link-footer: var(--site-link-primary);
+  --site-link-work: var(--site-tag-blue);
+  --site-link-notes: var(--site-tag-violet);
+  --site-link-readme: var(--site-tag-rose);
   --site-highlight-fill: rgba(47, 128, 255, 0.12);
   --site-highlight-stroke: rgba(47, 128, 255, 0.32);
   --site-tag-olive: #869966;
@@ -170,4 +183,14 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* ==================== MOTION ==================== */
+  --site-motion-link-duration: 260ms;
+  --site-motion-link-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --site-motion-glitch-duration: 220ms;
+  --site-motion-tag-stagger: 220ms;
+  --site-motion-tag-duration: 4200ms;
+  --site-motion-tag-reveal-delay: 240ms;
+  --site-motion-tag-scramble-step: 120ms;
+  --site-size-link-underline: 1px;
 }

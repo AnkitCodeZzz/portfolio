@@ -1,9 +1,9 @@
-import { Fragment } from "react";
 import Link from "next/link";
 import InteractiveRuler from "./components/InteractiveRuler";
 import Divider from "./components/Divider";
 import MobileHeader from "./components/MobileHeader";
-import { getAllNotes } from "./lib/notes";
+import PinIcon from "./components/PinIcon";
+import { getAllNotes, getNoteDisplayTitle } from "./lib/notes";
 import styles from "./page.module.css";
 
 const projects = [
@@ -64,15 +64,6 @@ const noteTagClasses = [
   styles.tagBrown,
   styles.tagRose,
 ];
-
-function PinIcon() {
-  return (
-    <span className={styles.pin} aria-hidden="true">
-      <span className={styles.pinPartA} />
-      <span className={styles.pinPartB} />
-    </span>
-  );
-}
 
 function TimelineConnector({ className }: { className?: string }) {
   return (
@@ -191,13 +182,13 @@ export default function HomePage() {
               </Link>
             </div>
             <div className={styles.noteList}>
-              {notes.map((note, noteIndex) => (
+              {notes.map((note) => (
                 <article key={note.slug} className={styles.noteRow}>
                   <div className={styles.noteContent}>
                     {note.tags.length > 0 ? (
                       <div className={styles.notesMeta}>
                         {note.tags.map((tag, tagIndex) => (
-                          <Fragment key={`${note.slug}-${tag}`}>
+                          <span className={styles.tagMetaItem} key={`${note.slug}-${tag}`}>
                             <span
                               data-ruler-tag
                               className={`${styles.noteTag} ${noteTagClasses[tagIndex % noteTagClasses.length]}`}
@@ -205,15 +196,15 @@ export default function HomePage() {
                               {tag}
                             </span>
                             {tagIndex < note.tags.length - 1 ? <span className={styles.dot}>•</span> : null}
-                          </Fragment>
+                          </span>
                         ))}
                       </div>
                     ) : null}
                     <Link href={`/notes/${note.slug}`} className={styles.noteTitleLink}>
-                      <h3 className={styles.noteTitle}>{note.title}</h3>
+                      <h3 className={styles.noteTitle}>{getNoteDisplayTitle(note)}</h3>
                     </Link>
                   </div>
-                  {noteIndex === 0 ? <PinIcon /> : null}
+                  {note.pinned ? <PinIcon /> : null}
                 </article>
               ))}
             </div>

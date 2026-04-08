@@ -1,8 +1,8 @@
-import { Fragment } from "react";
 import Link from "next/link";
 import Divider from "../components/Divider";
+import PinIcon from "../components/PinIcon";
 import PageFrame from "../components/PageFrame";
-import { getAllNotes } from "../lib/notes";
+import { getAllNotes, getNoteDisplayTitle } from "../lib/notes";
 import editorial from "../styles/editorial.module.css";
 import homeStyles from "../page.module.css";
 
@@ -16,13 +16,23 @@ const tagClasses = [
 
 export default function NotesPage() {
   const notes = getAllNotes();
+  const editingEnabled = process.env.NODE_ENV === "development";
 
   return (
     <PageFrame>
       <section className={homeStyles.hero} data-ruler-track>
         <div className={editorial.introBlock}>
           <div className={editorial.introCopy}>
-            <h1 className={editorial.pageTitle}>Notes</h1>
+            <div className={`${editorial.detailTopBar} ${editorial.introTopBar}`}>
+              <h1 className={editorial.pageTitle}>My Notes</h1>
+              {editingEnabled ? (
+                <div className={editorial.utilityRow}>
+                  <Link href="/notes/new/edit" className={editorial.utilityLink}>
+                    New note
+                  </Link>
+                </div>
+              ) : null}
+            </div>
             <p className={editorial.pageTagline}>
               Thinking out loud about design, craft, and the things I&apos;m trying to understand more clearly.
             </p>
@@ -45,7 +55,7 @@ export default function NotesPage() {
                   {note.tags.length > 0 ? (
                     <div className={homeStyles.notesMeta}>
                       {note.tags.map((tag, tagIndex) => (
-                        <Fragment key={`${note.slug}-${tag}`}>
+                        <span className={homeStyles.tagMetaItem} key={`${note.slug}-${tag}`}>
                           <span
                             data-ruler-tag
                             className={`${homeStyles.noteTag} ${tagClasses[tagIndex % tagClasses.length]}`}
@@ -53,15 +63,16 @@ export default function NotesPage() {
                             {tag}
                           </span>
                           {tagIndex < note.tags.length - 1 ? <span className={homeStyles.dot}>•</span> : null}
-                        </Fragment>
+                        </span>
                       ))}
                     </div>
                   ) : null}
 
                   <Link href={`/notes/${note.slug}`} className={homeStyles.noteTitleLink}>
-                    <h2 className={homeStyles.noteTitle}>{note.title}</h2>
+                    <h2 className={homeStyles.noteTitle}>{getNoteDisplayTitle(note)}</h2>
                   </Link>
                 </div>
+                {note.pinned ? <PinIcon /> : null}
               </article>
             ))}
           </div>

@@ -597,6 +597,10 @@ export default function InteractiveRuler() {
       return undefined;
     }
 
+    tagElements.forEach((tag) => {
+      ensureTagLayers(tag);
+    });
+
     const triggerTagScramble = (tag: HTMLElement) => {
       const styleSource = window.getComputedStyle(sidebar);
       const durationMs = getNumericCustomProperty(styleSource, "--site-motion-tag-duration", 2400);

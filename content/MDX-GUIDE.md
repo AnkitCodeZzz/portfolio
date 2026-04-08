@@ -25,6 +25,10 @@ description: "Short summary."
 ## Blockquote
 > Quote text here
 
+## Line breaks
+- New paragraph → leave a blank line between paragraphs
+- Forced line break → end the line with two spaces or use `<br />`
+
 ## Code block
 ```js
 const x = 10;

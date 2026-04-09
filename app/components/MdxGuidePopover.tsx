@@ -12,6 +12,8 @@ const MDX_GUIDE_ITEMS = [
   { label: "List", example: "- Bullet item" },
   { label: "Quote", example: "> Quote text" },
   { label: "Image", example: "![Alt text](/notes/image.jpg)" },
+  { label: "Facts", example: "<Facts> + <Fact />" },
+  { label: "Accordion", example: "<Accordion title=\"...\">" },
   { label: "Line break", example: "Blank line or <br />" },
 ] as const;
 

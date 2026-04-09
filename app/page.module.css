@@ -334,6 +334,8 @@ a.heroNow {
 .heroNow {
   display: inline-flex;
   align-items: center;
+  align-self: flex-start;
+  width: fit-content;
   white-space: nowrap;
   text-decoration: none;
 }
@@ -995,7 +997,9 @@ a.heroNow {
   }
 
   .noteTitleLink:hover .noteTitle,
-  .noteTitleLink:focus-visible .noteTitle {
+  .noteTitleLink:focus-visible .noteTitle,
+  .noteTitleLink:hover .projectTitle,
+  .noteTitleLink:focus-visible .projectTitle {
     color: var(--site-link-primary);
     text-decoration-color: var(--site-link-primary);
   }

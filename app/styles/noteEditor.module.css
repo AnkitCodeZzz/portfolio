@@ -401,6 +401,11 @@
   gap: 4px;
 }
 
+.metaFieldHeaderStacked {
+  flex-direction: column;
+  justify-content: center;
+}
+
 .infoTooltip {
   position: relative;
   display: inline-flex;
@@ -584,6 +589,16 @@
   font-feature-settings: "ss09" 1;
 }
 
+.metaInput.guidedProjectCategoryInput {
+  font-family: var(--font-family-mono);
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--site-muted-soft);
+}
+
 .metaHint {
   font-family: var(--font-family-mono);
   font-size: var(--site-size-meta);
@@ -702,12 +717,14 @@
   align-items: center;
   gap: 6px;
   white-space: nowrap;
+  font-size: var(--site-size-meta);
+  color: var(--site-muted);
 }
 
 .bodyShortcutCommand {
   display: inline-flex;
   align-items: center;
-  font-size: 16px;
+  font-size: 20px;
   line-height: 1;
 }
 
@@ -736,7 +753,8 @@
   display: inline-flex;
 }
 
-.guideTrigger {
+.guideTrigger,
+.bodyToolButton {
   appearance: none;
   border: 0;
   background: transparent;
@@ -748,7 +766,43 @@
   line-height: 1.2;
   letter-spacing: 0.01em;
   color: var(--site-muted);
-  text-transform: none;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bodyToolButton:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.bodyToolIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+}
+
+.bodyToolIcon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bodyToolDesktopOnly {
+  display: inline-flex;
+}
+
+.hiddenUploadInput {
+  display: none;
 }
 
 .guidePanel {
@@ -886,7 +940,9 @@
   }
 
   .guideTrigger:hover,
+  .bodyToolButton:hover,
   .guideTrigger:focus-visible,
+  .bodyToolButton:focus-visible,
   .guideClose:hover,
   .guideClose:focus-visible {
     color: var(--site-link-primary);
@@ -997,6 +1053,10 @@
   .bodyMeta.bodyShortcut {
     display: inline-flex;
     white-space: nowrap;
+  }
+
+  .bodyToolDesktopOnly {
+    display: none;
   }
 
   .guideOverlay {

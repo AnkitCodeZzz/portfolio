@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import Divider from "./Divider";
+import { sharedMdxComponents } from "./MdxContentBlocks";
 import PageFrame from "./PageFrame";
 import { getPageDocumentDisplayTitle } from "../lib/pageDocuments";
 import { splitMdxIntoSections } from "../lib/mdxSections";
@@ -62,7 +63,11 @@ export default function PageDocumentView({ page }: PageDocumentViewProps) {
           >
             <div className={editorial.proseWrap}>
               <div className="prose">
-                <MDXRemote source={section.source} options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }} />
+                <MDXRemote
+                  source={section.source}
+                  components={sharedMdxComponents}
+                  options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+                />
               </div>
             </div>
           </section>

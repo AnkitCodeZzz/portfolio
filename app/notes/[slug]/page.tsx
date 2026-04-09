@@ -5,6 +5,7 @@ import Link from "next/link";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import DeleteNoteButton from "../../components/DeleteNoteButton";
 import Divider from "../../components/Divider";
+import { sharedMdxComponents } from "../../components/MdxContentBlocks";
 import NoteScrollRestorer from "../../components/NoteScrollRestorer";
 import PageFrame from "../../components/PageFrame";
 import PinIcon from "../../components/PinIcon";
@@ -113,7 +114,11 @@ export default async function NotePage({
           >
             <div className={editorial.proseWrap}>
               <div className="prose">
-                <MDXRemote source={section.source} options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }} />
+                <MDXRemote
+                  source={section.source}
+                  components={sharedMdxComponents}
+                  options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+                />
               </div>
             </div>
           </section>

@@ -4,9 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import AutoResizeTextarea from "./AutoResizeTextarea";
 import Divider from "./Divider";
+import EditorImageUploadButton from "./EditorImageUploadButton";
 import MdxGuidePopover from "./MdxGuidePopover";
 import editorial from "../styles/editorial.module.css";
 import styles from "../styles/noteEditor.module.css";
+import { insertMarkdownBlock, type EditorSelectionRange } from "../lib/editorMarkdown";
 
 type PageDocumentEditorPage = {
   key: "readme" | "now";
@@ -94,6 +96,8 @@ export default function PageDocumentEditor({
   page,
 }: PageDocumentEditorProps) {
   const router = useRouter();
+  const bodyTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const bodySelectionRef = useRef<EditorSelectionRange | null>(null);
   const toastTimeoutRef = useRef<number | null>(null);
   const [draft, setDraft] = useState(() => toDraftState(page));
   const [savedDraft, setSavedDraft] = useState(() => toDraftState(page));
@@ -147,6 +151,62 @@ export default function PageDocumentEditor({
     if (saveState !== "idle") {
       setSaveState("idle");
     }
+  }
+
+  function rememberBodySelection() {
+    const textarea = bodyTextareaRef.current;
+
+    if (!textarea) {
+      return;
+    }
+
+    bodySelectionRef.current = {
+      start: textarea.selectionStart,
+      end: textarea.selectionEnd,
+    };
+  }
+
+  function insertBodyMarkdown(markdown: string) {
+    let nextCaret = draft.content.length;
+
+    setDraft((currentDraft) => {
+      const textarea = bodyTextareaRef.current;
+      const selection = bodySelectionRef.current ?? {
+        start: textarea?.selectionStart ?? currentDraft.content.length,
+        end: textarea?.selectionEnd ?? currentDraft.content.length,
+      };
+      const insertion = insertMarkdownBlock(
+        currentDraft.content,
+        markdown,
+        selection
+      );
+
+      nextCaret = insertion.caret;
+
+      return {
+        ...currentDraft,
+        content: insertion.text,
+      };
+    });
+
+    if (saveState !== "idle") {
+      setSaveState("idle");
+    }
+
+    window.requestAnimationFrame(() => {
+      const textarea = bodyTextareaRef.current;
+
+      if (!textarea) {
+        return;
+      }
+
+      textarea.focus();
+      textarea.setSelectionRange(nextCaret, nextCaret);
+      bodySelectionRef.current = {
+        start: nextCaret,
+        end: nextCaret,
+      };
+    });
   }
 
   useEffect(() => {
@@ -518,26 +578,66 @@ export default function PageDocumentEditor({
                     Body
                   </label>
                   <div className={styles.bodyTools}>
-                    <span className={`${styles.bodyMeta} ${styles.bodyShortcut}`}>
+                    <EditorImageUploadButton
+                      bucket="pages"
+                      identifier={page.key}
+                      missingIdentifierMessage="This page is missing its document key."
+                      className={`${styles.bodyToolButton} ${styles.bodyToolDesktopOnly}`}
+                      onUploaded={(upload) => {
+                        insertBodyMarkdown(upload.markdown);
+                        showToast(
+                          {
+                            tone: "saved",
+                            label: "Image added.",
+                            detail: `Inserted ${upload.path} at the cursor. Update the alt text if needed.`,
+                          },
+                          3600
+                        );
+                      }}
+                      onError={(message) => {
+                        showToast(
+                          {
+                            tone: "error",
+                            label: "Upload failed.",
+                            detail: message,
+                          },
+                          3600
+                        );
+                      }}
+                    />
+                    <span
+                      className={`${styles.bodyToolDivider} ${styles.bodyToolDesktopOnly}`}
+                      aria-hidden="true"
+                    />
+                    <MdxGuidePopover />
+                    <span
+                      className={styles.bodyToolDivider}
+                      aria-hidden="true"
+                    />
+                    <span
+                      className={`${styles.bodyMeta} ${styles.bodyShortcut}`}
+                    >
                       <span className={styles.bodyShortcutCommand}>⌘</span>
                       <span className={styles.bodyShortcutKeys}>+ S</span>
                     </span>
-                    <span className={styles.bodyToolDivider} aria-hidden="true" />
-                    <MdxGuidePopover />
                   </div>
                 </div>
 
                 <div className={styles.bodyFrame}>
                   <AutoResizeTextarea
                     id={`${page.key}-content`}
+                    ref={bodyTextareaRef}
                     className={styles.bodyInput}
                     rows={18}
                     autoComplete="off"
                     spellCheck
                     value={draft.content}
+                    onClick={rememberBodySelection}
                     onChange={(event) => {
                       updateDraft("content", event.target.value);
                     }}
+                    onKeyUp={rememberBodySelection}
+                    onSelect={rememberBodySelection}
                   />
                 </div>
               </div>

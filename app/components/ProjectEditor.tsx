@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 import AutoResizeTextarea from "./AutoResizeTextarea";
 import Breadcrumbs from "./Breadcrumbs";
 import Divider from "./Divider";
+import EditorImageUploadButton from "./EditorImageUploadButton";
 import MdxGuidePopover from "./MdxGuidePopover";
 import editorial from "../styles/editorial.module.css";
 import styles from "../styles/noteEditor.module.css";
+import { insertMarkdownBlock, type EditorSelectionRange } from "../lib/editorMarkdown";
 import {
   PROJECT_COLOR_OPTIONS,
   PROJECT_TYPES,
@@ -193,6 +195,8 @@ export default function ProjectEditor({
   mode = "edit",
 }: ProjectEditorProps) {
   const router = useRouter();
+  const bodyTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const bodySelectionRef = useRef<EditorSelectionRange | null>(null);
   const toastTimeoutRef = useRef<number | null>(null);
   const [editorMode, setEditorMode] = useState(mode);
   const [draft, setDraft] = useState(() => toDraftState(project));
@@ -380,6 +384,62 @@ export default function ProjectEditor({
     if (saveState !== "idle") {
       setSaveState("idle");
     }
+  }
+
+  function rememberBodySelection() {
+    const textarea = bodyTextareaRef.current;
+
+    if (!textarea) {
+      return;
+    }
+
+    bodySelectionRef.current = {
+      start: textarea.selectionStart,
+      end: textarea.selectionEnd,
+    };
+  }
+
+  function insertBodyMarkdown(markdown: string) {
+    let nextCaret = draft.content.length;
+
+    setDraft((currentDraft) => {
+      const textarea = bodyTextareaRef.current;
+      const selection = bodySelectionRef.current ?? {
+        start: textarea?.selectionStart ?? currentDraft.content.length,
+        end: textarea?.selectionEnd ?? currentDraft.content.length,
+      };
+      const insertion = insertMarkdownBlock(
+        currentDraft.content,
+        markdown,
+        selection
+      );
+
+      nextCaret = insertion.caret;
+
+      return {
+        ...currentDraft,
+        content: insertion.text,
+      };
+    });
+
+    if (saveState !== "idle") {
+      setSaveState("idle");
+    }
+
+    window.requestAnimationFrame(() => {
+      const textarea = bodyTextareaRef.current;
+
+      if (!textarea) {
+        return;
+      }
+
+      textarea.focus();
+      textarea.setSelectionRange(nextCaret, nextCaret);
+      bodySelectionRef.current = {
+        start: nextCaret,
+        end: nextCaret,
+      };
+    });
   }
 
   async function handleSave(
@@ -587,18 +647,18 @@ export default function ProjectEditor({
           <div className={styles.editorPaper}>
             <div className={styles.editorPaperTop}>
               <div className={styles.editorHeroFields}>
-                <div className={`${styles.guidedField} ${styles.guidedFieldOlive}`}>
+                <div className={`${styles.guidedField} ${styles.guidedFieldMuted}`}>
                   <div className={styles.guidedLead}>
                     <div className={styles.guidedLeadMeta}>
-                      <div className={styles.metaFieldHeader}>
-                        <label className={styles.guidedLabel} htmlFor="project-slug">
-                          Slug
-                        </label>
+                      <div className={`${styles.metaFieldHeader} ${styles.metaFieldHeaderStacked}`}>
                         <FieldHint
                           label="About project slug"
                           text="Short URL slug. Spaces become hyphens."
                           tone="olive"
                         />
+                        <label className={styles.guidedLabel} htmlFor="project-slug">
+                          Slug
+                        </label>
                       </div>
                     </div>
                     <div className={styles.guidedLine} aria-hidden="true">
@@ -702,18 +762,18 @@ export default function ProjectEditor({
                   </div>
                 </div>
 
-                <div className={`${styles.guidedField} ${styles.guidedFieldOlive}`}>
+                <div className={`${styles.guidedField} ${styles.guidedFieldMuted}`}>
                   <div className={styles.guidedLead}>
                     <div className={styles.guidedLeadMeta}>
-                      <div className={styles.metaFieldHeader}>
-                        <label className={styles.guidedLabel} htmlFor="project-category">
-                          Category
-                        </label>
+                      <div className={`${styles.metaFieldHeader} ${styles.metaFieldHeaderStacked}`}>
                         <FieldHint
                           label="About project category"
                           text="This is the short label shown above the project title."
                           tone="olive"
                         />
+                        <label className={styles.guidedLabel} htmlFor="project-category">
+                          Category
+                        </label>
                       </div>
                     </div>
                     <div className={styles.guidedLine} aria-hidden="true">
@@ -868,26 +928,66 @@ export default function ProjectEditor({
                     Body
                   </label>
                   <div className={styles.bodyTools}>
-                    <span className={`${styles.bodyMeta} ${styles.bodyShortcut}`}>
+                    <EditorImageUploadButton
+                      bucket="work"
+                      identifier={draft.slug.trim()}
+                      missingIdentifierMessage="Add a slug before uploading an image."
+                      className={`${styles.bodyToolButton} ${styles.bodyToolDesktopOnly}`}
+                      onUploaded={(upload) => {
+                        insertBodyMarkdown(upload.markdown);
+                        showToast(
+                          {
+                            tone: "saved",
+                            label: "Image added.",
+                            detail: `Inserted ${upload.path} at the cursor. Update the alt text if needed.`,
+                          },
+                          3600
+                        );
+                      }}
+                      onError={(message) => {
+                        showToast(
+                          {
+                            tone: "error",
+                            label: "Upload failed.",
+                            detail: message,
+                          },
+                          3600
+                        );
+                      }}
+                    />
+                    <span
+                      className={`${styles.bodyToolDivider} ${styles.bodyToolDesktopOnly}`}
+                      aria-hidden="true"
+                    />
+                    <MdxGuidePopover />
+                    <span
+                      className={styles.bodyToolDivider}
+                      aria-hidden="true"
+                    />
+                    <span
+                      className={`${styles.bodyMeta} ${styles.bodyShortcut}`}
+                    >
                       <span className={styles.bodyShortcutCommand}>⌘</span>
                       <span className={styles.bodyShortcutKeys}>+ S</span>
                     </span>
-                    <span className={styles.bodyToolDivider} aria-hidden="true" />
-                    <MdxGuidePopover />
                   </div>
                 </div>
 
                 <div className={styles.bodyFrame}>
                   <AutoResizeTextarea
                     id="project-content"
+                    ref={bodyTextareaRef}
                     className={styles.bodyInput}
                     rows={18}
                     autoComplete="off"
                     spellCheck
                     value={draft.content}
+                    onClick={rememberBodySelection}
                     onChange={(event) => {
                       updateDraft("content", event.target.value);
                     }}
+                    onKeyUp={rememberBodySelection}
+                    onSelect={rememberBodySelection}
                   />
                 </div>
               </div>

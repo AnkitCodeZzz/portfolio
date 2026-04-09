@@ -11,9 +11,11 @@ import { useRouter } from "next/navigation";
 import AutoResizeTextarea from "./AutoResizeTextarea";
 import Breadcrumbs from "./Breadcrumbs";
 import Divider from "./Divider";
+import EditorImageUploadButton from "./EditorImageUploadButton";
 import MdxGuidePopover from "./MdxGuidePopover";
 import editorial from "../styles/editorial.module.css";
 import styles from "../styles/noteEditor.module.css";
+import { insertMarkdownBlock, type EditorSelectionRange } from "../lib/editorMarkdown";
 import { getNoteTagColorCssValueForColor, NOTE_TAGS, sanitizeNoteTags } from "../lib/noteTags";
 import type { Note } from "../lib/notes";
 
@@ -197,6 +199,7 @@ function getLocalNotePath(slug: string) {
 export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
   const router = useRouter();
   const bodyTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const bodySelectionRef = useRef<EditorSelectionRange | null>(null);
   const toastTimeoutRef = useRef<number | null>(null);
   const [editorMode, setEditorMode] = useState(mode);
   const [draft, setDraft] = useState(() => toDraftState(note));
@@ -561,6 +564,62 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
     }
   }
 
+  function rememberBodySelection() {
+    const textarea = bodyTextareaRef.current;
+
+    if (!textarea) {
+      return;
+    }
+
+    bodySelectionRef.current = {
+      start: textarea.selectionStart,
+      end: textarea.selectionEnd,
+    };
+  }
+
+  function insertBodyMarkdown(markdown: string) {
+    let nextCaret = draft.content.length;
+
+    setDraft((currentDraft) => {
+      const textarea = bodyTextareaRef.current;
+      const selection = bodySelectionRef.current ?? {
+        start: textarea?.selectionStart ?? currentDraft.content.length,
+        end: textarea?.selectionEnd ?? currentDraft.content.length,
+      };
+      const insertion = insertMarkdownBlock(
+        currentDraft.content,
+        markdown,
+        selection
+      );
+
+      nextCaret = insertion.caret;
+
+      return {
+        ...currentDraft,
+        content: insertion.text,
+      };
+    });
+
+    if (saveState !== "idle") {
+      setSaveState("idle");
+    }
+
+    window.requestAnimationFrame(() => {
+      const textarea = bodyTextareaRef.current;
+
+      if (!textarea) {
+        return;
+      }
+
+      textarea.focus();
+      textarea.setSelectionRange(nextCaret, nextCaret);
+      bodySelectionRef.current = {
+        start: nextCaret,
+        end: nextCaret,
+      };
+    });
+  }
+
   function handlePreview() {
     if (isCreating) {
       return;
@@ -884,12 +943,48 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
                     Body
                   </label>
                   <div className={styles.bodyTools}>
-                    <span className={`${styles.bodyMeta} ${styles.bodyShortcut}`}>
+                    <EditorImageUploadButton
+                      bucket="notes"
+                      identifier={draft.slug.trim()}
+                      missingIdentifierMessage="Add a slug before uploading an image."
+                      className={`${styles.bodyToolButton} ${styles.bodyToolDesktopOnly}`}
+                      onUploaded={(upload) => {
+                        insertBodyMarkdown(upload.markdown);
+                        showToast(
+                          {
+                            tone: "saved",
+                            label: "Image added.",
+                            detail: `Inserted ${upload.path} at the cursor. Update the alt text if needed.`,
+                          },
+                          3600
+                        );
+                      }}
+                      onError={(message) => {
+                        showToast(
+                          {
+                            tone: "error",
+                            label: "Upload failed.",
+                            detail: message,
+                          },
+                          3600
+                        );
+                      }}
+                    />
+                    <span
+                      className={`${styles.bodyToolDivider} ${styles.bodyToolDesktopOnly}`}
+                      aria-hidden="true"
+                    />
+                    <MdxGuidePopover />
+                    <span
+                      className={styles.bodyToolDivider}
+                      aria-hidden="true"
+                    />
+                    <span
+                      className={`${styles.bodyMeta} ${styles.bodyShortcut}`}
+                    >
                       <span className={styles.bodyShortcutCommand}>⌘</span>
                       <span className={styles.bodyShortcutKeys}>+ S</span>
                     </span>
-                    <span className={styles.bodyToolDivider} aria-hidden="true" />
-                    <MdxGuidePopover />
                   </div>
                 </div>
 
@@ -902,9 +997,12 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
                     autoComplete="off"
                     spellCheck
                     value={draft.content}
+                    onClick={rememberBodySelection}
                     onChange={(event) => {
                       updateDraft("content", event.target.value);
                     }}
+                    onKeyUp={rememberBodySelection}
+                    onSelect={rememberBodySelection}
                   />
                 </div>
               </div>

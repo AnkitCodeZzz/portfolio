@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import DeleteProjectButton from "../../components/DeleteProjectButton";
 import Divider from "../../components/Divider";
+import { sharedMdxComponents } from "../../components/MdxContentBlocks";
 import NoteScrollRestorer from "../../components/NoteScrollRestorer";
 import PageFrame from "../../components/PageFrame";
 import PinIcon from "../../components/PinIcon";
@@ -111,6 +112,7 @@ export default async function WorkProjectPage({
               <div className="prose">
                 <MDXRemote
                   source={section.source}
+                  components={sharedMdxComponents}
                   options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
                 />
               </div>

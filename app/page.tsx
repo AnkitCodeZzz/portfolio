@@ -5,29 +5,12 @@ import MobileHeader from "./components/MobileHeader";
 import PinIcon from "./components/PinIcon";
 import { getAllNotes, getNoteDisplayTitle } from "./lib/notes";
 import { getNoteTagColorCssValue, getNoteTagLabel } from "./lib/noteTags";
+import { getProjectColorCssValue } from "./lib/projectMeta";
+import {
+  getAllProjects,
+  getProjectDisplayTitle,
+} from "./lib/projects";
 import styles from "./page.module.css";
-
-const projects = [
-  {
-    label: "UI Redesign",
-    labelClassName: styles.tagBrown,
-    title: "Redesigning Goodreads",
-    description: "Revamped Goodread's UI → A fresh perspective to discovery, organisation, and community.",
-    pinned: true,
-  },
-  {
-    label: "Usability Testing",
-    labelClassName: styles.tagViolet,
-    title: "Tripwise Usability Testing",
-    description: "Conducted extensive usability testing for an online travel agency.",
-  },
-  {
-    label: "Experience Design",
-    labelClassName: styles.tagRose,
-    title: "Rigved's Omnichannel Experience",
-    description: "Designed an omnichannel experience for a sports retail brand.",
-  },
-];
 
 const backgroundEntries = {
   lead: {
@@ -92,6 +75,7 @@ function TimelineConnector({ className }: { className?: string }) {
 
 export default function HomePage() {
   const notes = getAllNotes().slice(0, 5);
+  const projects = getAllProjects().slice(0, 3);
 
   return (
     <main className={styles.page}>
@@ -102,11 +86,15 @@ export default function HomePage() {
             <span className={styles.brandMuted}>Mandal</span>
           </Link>
           <nav className={styles.desktopNav} aria-label="Primary">
-            <span className={`${styles.navItem} ${styles.navWork}`}>/work</span>
+            <Link href="/work" className={`${styles.inactiveLink} ${styles.navWork}`}>
+              /work
+            </Link>
             <Link href="/notes" className={`${styles.inactiveLink} ${styles.navNotes}`}>
               /notes
             </Link>
-            <span className={`${styles.navItem} ${styles.navReadme}`}>/readme</span>
+            <Link href="/readme" className={`${styles.inactiveLink} ${styles.navReadme}`}>
+              /readme
+            </Link>
           </nav>
         </div>
         <MobileHeader />
@@ -133,7 +121,9 @@ export default function HomePage() {
               eye for detail and a sense for what feels right. I care about taste, clarity and how things actually
               work. I rely on data to make sense of things when it gets blurry and I don&apos;t let things slide easily.
             </p>
-            <span className={styles.heroNow}>/now</span>
+            <Link href="/now" className={styles.heroNow}>
+              /now
+            </Link>
           </section>
 
           <Divider />
@@ -143,19 +133,33 @@ export default function HomePage() {
               <h2 id="projects-title" className={styles.sectionTitle}>
                 My Projects
               </h2>
-              <span className={styles.sectionAction}>view all</span>
+              <Link href="/work" className={styles.sectionAction}>
+                view all
+              </Link>
             </div>
             <div className={styles.projectList}>
               {projects.map((project) => (
-                <article key={project.title} className={styles.projectRow}>
-                  <div>
-                    <div className={styles.entryMeta}>
-                      <span data-ruler-tag className={`${styles.entryLabel} ${project.labelClassName}`}>
-                        {project.label}
-                      </span>
-                    </div>
-                    <h3 className={styles.projectTitle}>{project.title}</h3>
-                    <p className={styles.projectDescription}>{project.description}</p>
+                <article key={project.slug} className={styles.projectRow}>
+                  <div className={styles.projectContent}>
+                    {project.category ? (
+                      <div className={styles.entryMeta}>
+                        <span
+                          data-ruler-tag
+                          className={styles.entryLabel}
+                          style={{ color: getProjectColorCssValue(project.color) }}
+                        >
+                          {project.category}
+                        </span>
+                      </div>
+                    ) : null}
+                    <Link href={`/work/${project.slug}`} className={styles.noteTitleLink}>
+                      <h3 className={styles.projectTitle}>
+                        {getProjectDisplayTitle(project)}
+                      </h3>
+                    </Link>
+                    {project.description ? (
+                      <p className={styles.projectDescription}>{project.description}</p>
+                    ) : null}
                   </div>
                   {project.pinned ? <PinIcon /> : null}
                 </article>

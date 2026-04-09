@@ -150,6 +150,11 @@
   --site-link-accent: var(--site-link-readme);
 }
 
+.navActive {
+  color: var(--site-link-accent);
+  font-weight: var(--font-weight-medium);
+}
+
 .heroNow,
 .sectionAction {
   font-family: var(--font-family-mono);
@@ -177,9 +182,13 @@
     transform var(--site-motion-link-duration) var(--site-motion-link-ease);
 }
 
-.inactiveLink,
-a.sectionAction {
+a.sectionAction,
+a.heroNow {
   --site-link-accent: var(--site-link-primary);
+  position: relative;
+}
+
+.inactiveLink {
   position: relative;
 }
 
@@ -326,6 +335,7 @@ a.sectionAction {
   display: inline-flex;
   align-items: center;
   white-space: nowrap;
+  text-decoration: none;
 }
 
 .dividerWrap {
@@ -421,6 +431,13 @@ a.sectionAction {
   flex-direction: column;
   align-items: flex-start;
   gap: var(--site-space-entry-gap);
+}
+
+.projectContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
 }
 
 .pin {
@@ -954,6 +971,8 @@ a.sectionAction {
 
   .inactiveLink:hover,
   .inactiveLink:focus-visible,
+  a.heroNow:hover,
+  a.heroNow:focus-visible,
   a.sectionAction:hover,
   a.sectionAction:focus-visible {
     color: var(--site-link-accent);

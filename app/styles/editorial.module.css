@@ -33,11 +33,19 @@
   gap: var(--spacing-2xl);
 }
 
+.detailLeadSolo {
+  gap: var(--site-space-section);
+}
+
 .detailTopBar {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--site-space-row-gap);
+}
+
+.detailTopBarSolo {
+  justify-content: flex-end;
 }
 
 .introTopBar {
@@ -476,6 +484,7 @@
   .utilityLinkDanger:hover,
   .utilityLinkDanger:focus-visible {
     color: var(--site-tag-rose);
+    opacity: 0.72;
   }
 
   .entryLink:hover .entryTitle,

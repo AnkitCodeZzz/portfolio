@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import styles from "../page.module.css";
 
@@ -9,11 +10,15 @@ type MobileHeaderProps = {
 };
 
 export default function MobileHeader({ showNav = true }: MobileHeaderProps) {
+  const pathname = usePathname();
   const [navHidden, setNavHidden] = useState(false);
   const navHiddenRef = useRef(false);
   const transitionLockUntilRef = useRef(0);
   const lastTouchYRef = useRef<number | null>(null);
   const frameRef = useRef(0);
+  const isWorkActive = pathname === "/work" || pathname.startsWith("/work/");
+  const isNotesActive = pathname === "/notes" || pathname.startsWith("/notes/");
+  const isReadmeActive = pathname === "/readme" || pathname.startsWith("/readme/");
 
   useEffect(() => {
     if (!showNav) {
@@ -163,11 +168,27 @@ export default function MobileHeader({ showNav = true }: MobileHeaderProps) {
           <div className={styles.mobileNavRow}>
             <div className={styles.mobileNavRuler} aria-hidden="true" />
             <nav className={styles.mobileNav} aria-label="Primary">
-              <span className={`${styles.navItem} ${styles.navWork}`}>/work</span>
-              <Link href="/notes" className={`${styles.inactiveLink} ${styles.navNotes}`}>
+              <Link
+                href="/work"
+                className={`${styles.inactiveLink} ${styles.navWork} ${isWorkActive ? styles.navActive : ""}`.trim()}
+                aria-current={isWorkActive ? "page" : undefined}
+              >
+                /work
+              </Link>
+              <Link
+                href="/notes"
+                className={`${styles.inactiveLink} ${styles.navNotes} ${isNotesActive ? styles.navActive : ""}`.trim()}
+                aria-current={isNotesActive ? "page" : undefined}
+              >
                 /notes
               </Link>
-              <span className={`${styles.navItem} ${styles.navReadme}`}>/readme</span>
+              <Link
+                href="/readme"
+                className={`${styles.inactiveLink} ${styles.navReadme} ${isReadmeActive ? styles.navActive : ""}`.trim()}
+                aria-current={isReadmeActive ? "page" : undefined}
+              >
+                /readme
+              </Link>
             </nav>
           </div>
         </div>

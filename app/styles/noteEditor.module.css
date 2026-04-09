@@ -6,6 +6,10 @@
   gap: var(--site-space-row-gap);
 }
 
+.editorTopBarSolo {
+  justify-content: flex-end;
+}
+
 .editorDetailBlock {
   gap: 48px;
 }

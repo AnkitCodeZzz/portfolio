@@ -127,9 +127,9 @@
   --site-muted-faint: #c3c3ca;
   --site-link-primary: #7a9640;
   --site-link-footer: var(--site-link-primary);
-  --site-link-work: var(--site-tag-blue);
-  --site-link-notes: var(--site-tag-violet);
-  --site-link-readme: var(--site-tag-rose);
+  --site-link-work: #4f969e;
+  --site-link-notes: #789a37;
+  --site-link-readme: #a15a5a;
   --site-highlight-fill: rgba(47, 128, 255, 0.12);
   --site-highlight-stroke: rgba(47, 128, 255, 0.32);
   --site-tag-olive: #869966;

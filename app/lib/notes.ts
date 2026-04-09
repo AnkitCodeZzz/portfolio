@@ -23,6 +23,19 @@ export type NoteInput = Note;
 
 export class NoteSaveError extends Error {}
 
+type NoteListCacheEntry = {
+  signature: string;
+  value: NoteMetadata[];
+};
+
+type NoteCacheEntry = {
+  mtimeMs: number;
+  value: Note;
+};
+
+let noteListCache: NoteListCacheEntry | null = null;
+const noteCache = new Map<string, NoteCacheEntry>();
+
 function getNoteFilePath(slug: string) {
   if (!NOTE_SLUG_PATTERN.test(slug)) {
     return null;
@@ -35,6 +48,34 @@ function getNoteFilePath(slug: string) {
   }
 
   return filePath;
+}
+
+function invalidateNoteCache(slug?: string) {
+  noteListCache = null;
+
+  if (slug) {
+    noteCache.delete(slug);
+    return;
+  }
+
+  noteCache.clear();
+}
+
+function getNotesListSignature() {
+  const files = fs
+    .readdirSync(notesDir)
+    .filter((file) => file.endsWith(".mdx"))
+    .sort();
+
+  const signature = files
+    .map((file) => {
+      const filePath = path.join(notesDir, file);
+      const { mtimeMs } = fs.statSync(filePath);
+      return `${file}:${mtimeMs}`;
+    })
+    .join("|");
+
+  return { files, signature };
 }
 
 function serializeNote(input: NoteInput) {
@@ -115,9 +156,13 @@ export function getNewNoteDraft(): Note {
 }
 
 export function getAllNotes(): NoteMetadata[] {
-  const files = fs.readdirSync(notesDir).filter((f) => f.endsWith(".mdx"));
+  const { files, signature } = getNotesListSignature();
 
-  return files
+  if (noteListCache?.signature === signature) {
+    return noteListCache.value;
+  }
+
+  const value = files
     .map((file) => {
       const slug = file.replace(/\.mdx$/, "");
       const raw = fs.readFileSync(path.join(notesDir, file), "utf8");
@@ -137,6 +182,10 @@ export function getAllNotes(): NoteMetadata[] {
         Number(b.pinned) - Number(a.pinned) ||
         new Date(b.date).getTime() - new Date(a.date).getTime()
     );
+
+  noteListCache = { signature, value };
+
+  return value;
 }
 
 export function getNote(slug: string): Note | null {
@@ -144,10 +193,17 @@ export function getNote(slug: string): Note | null {
 
   if (!filePath || !fs.existsSync(filePath)) return null;
 
+  const { mtimeMs } = fs.statSync(filePath);
+  const cached = noteCache.get(slug);
+
+  if (cached && cached.mtimeMs === mtimeMs) {
+    return cached.value;
+  }
+
   const raw = fs.readFileSync(filePath, "utf8");
   const { data, content } = matter(raw);
 
-  return {
+  const value = {
     slug,
     title: data.title ?? "",
     date: data.date ?? "",
@@ -156,6 +212,10 @@ export function getNote(slug: string): Note | null {
     pinned: data.pinned ?? false,
     content,
   };
+
+  noteCache.set(slug, { mtimeMs, value });
+
+  return value;
 }
 
 export function saveNote(slug: string, input: NoteInput): Note | null {
@@ -201,6 +261,8 @@ export function saveNote(slug: string, input: NoteInput): Note | null {
   }
 
   fs.writeFileSync(nextFilePath, serializeNote(input), "utf8");
+  invalidateNoteCache(slug);
+  invalidateNoteCache(nextSlug);
 
   return getNote(nextSlug);
 }
@@ -238,8 +300,15 @@ export function createNote(input: NoteInput): Note {
   }
 
   fs.writeFileSync(nextFilePath, serializeNote(input), "utf8");
+  invalidateNoteCache(nextSlug);
 
-  return getNote(nextSlug);
+  const nextNote = getNote(nextSlug);
+
+  if (!nextNote) {
+    throw new NoteSaveError("Unable to read the created note.");
+  }
+
+  return nextNote;
 }
 
 export function deleteNote(slug: string) {
@@ -250,6 +319,7 @@ export function deleteNote(slug: string) {
   }
 
   fs.unlinkSync(filePath);
+  invalidateNoteCache(slug);
 
   return true;
 }

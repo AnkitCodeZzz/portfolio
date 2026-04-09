@@ -1,12 +1,7 @@
 "use client";
 
-import {
-  useId,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import type { CSSProperties } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import AutoResizeTextarea from "./AutoResizeTextarea";
 import Breadcrumbs from "./Breadcrumbs";
@@ -14,35 +9,45 @@ import Divider from "./Divider";
 import MdxGuidePopover from "./MdxGuidePopover";
 import editorial from "../styles/editorial.module.css";
 import styles from "../styles/noteEditor.module.css";
-import { getNoteTagColorCssValueForColor, NOTE_TAGS, sanitizeNoteTags } from "../lib/noteTags";
-import type { Note } from "../lib/notes";
+import {
+  PROJECT_COLOR_OPTIONS,
+  PROJECT_TYPES,
+  getProjectColorCssValue,
+} from "../lib/projectMeta";
+import type { Project } from "../lib/projects";
 
-type NoteEditorProps = {
-  note: Note;
+type ProjectEditorProps = {
+  project: Project;
   mode?: "edit" | "create";
 };
 
 type DraftState = {
   slug: string;
   title: string;
+  type: Project["type"];
+  category: string;
+  color: Project["color"];
   description: string;
-  date: string;
-  tags: string[];
   pinned: boolean;
+  date: string;
   content: string;
 };
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 type ToastTone = "editing" | "saved" | "error";
-type ToastAction = "undo";
 type ToastState = {
   tone: ToastTone;
   label: string;
   detail: string;
-  action?: ToastAction;
 };
 
 type HintTone = "muted" | "olive";
+
+const SCROLL_KEY_PREFIX = "work-scroll:";
+const typeToneByKey: Record<Project["type"], Project["color"]> = {
+  "case-study": "blue",
+  craft: "brown",
+};
 
 const toastFrameStyle = {
   display: "inline-flex",
@@ -70,7 +75,6 @@ const toastActionsStyle = {
   flex: "0 0 auto",
 } as const;
 
-const SCROLL_KEY_PREFIX = "note-scroll:";
 function InfoIcon() {
   return (
     <svg viewBox="0 0 26 26" focusable="false" aria-hidden="true">
@@ -84,24 +88,6 @@ function InfoIcon() {
         fill="currentColor"
       />
     </svg>
-  );
-}
-
-function DoubleArrowLine() {
-  return (
-    <span className={styles.arrowRail} aria-hidden="true">
-      <span className={`${styles.arrowHead} ${styles.arrowHeadTop}`}>
-        <svg viewBox="0 0 7 9" focusable="false">
-          <path d="M0.5 3.5L3.5 0.5L6.5 3.5" />
-        </svg>
-      </span>
-      <span className={styles.arrowStem} />
-      <span className={`${styles.arrowHead} ${styles.arrowHeadBottom}`}>
-        <svg viewBox="0 0 7 9" focusable="false">
-          <path d="M0.5 5.5L3.5 8.5L6.5 5.5" />
-        </svg>
-      </span>
-    </span>
   );
 }
 
@@ -137,15 +123,17 @@ function FieldHint({
   );
 }
 
-function toDraftState(note: Note): DraftState {
+function toDraftState(project: Project): DraftState {
   return {
-    slug: note.slug,
-    title: note.title,
-    description: note.description,
-    date: note.date,
-    tags: sanitizeNoteTags(note.tags),
-    pinned: note.pinned,
-    content: note.content,
+    slug: project.slug,
+    title: project.title,
+    type: project.type,
+    category: project.category,
+    color: project.color,
+    description: project.description,
+    pinned: project.pinned,
+    date: project.date,
+    content: project.content,
   };
 }
 
@@ -184,24 +172,31 @@ function getMissingRequiredFields(draft: DraftState) {
   return [
     !draft.slug.trim() && "slug",
     !draft.title.trim() && "title",
-    draft.tags.length === 0 && "tags",
+    !draft.type.trim() && "type",
+    !draft.category.trim() && "category",
+    !draft.color.trim() && "color",
     !draft.description.trim() && "description",
     !draft.date.trim() && "date",
   ].filter(Boolean) as string[];
 }
 
-function getLocalNotePath(slug: string) {
-  return `content/notes/${slug}.mdx`;
+function getLocalProjectPath(slug: string) {
+  return `content/work/${slug}.mdx`;
 }
 
-export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
+function getProjectSlugPlaceholder() {
+  return "untitled-project";
+}
+
+export default function ProjectEditor({
+  project,
+  mode = "edit",
+}: ProjectEditorProps) {
   const router = useRouter();
-  const bodyTextareaRef = useRef<HTMLTextAreaElement>(null);
   const toastTimeoutRef = useRef<number | null>(null);
   const [editorMode, setEditorMode] = useState(mode);
-  const [draft, setDraft] = useState(() => toDraftState(note));
-  const [savedDraft, setSavedDraft] = useState(() => toDraftState(note));
-  const [undoDraft, setUndoDraft] = useState<DraftState | null>(null);
+  const [draft, setDraft] = useState(() => toDraftState(project));
+  const [savedDraft, setSavedDraft] = useState(() => toDraftState(project));
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [toast, setToast] = useState<ToastState | null>(null);
   const [pendingLeaveHref, setPendingLeaveHref] = useState<string | null>(null);
@@ -210,13 +205,12 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
   const isDirty = JSON.stringify(draft) !== JSON.stringify(savedDraft);
   const persistedSlug = savedDraft.slug;
   const activeSlug = persistedSlug || draft.slug;
-  const activeSlugLabel = formatSlugLabel(activeSlug) || "new note";
+  const activeSlugLabel = formatSlugLabel(activeSlug) || "new project";
   const missingRequiredFields = getMissingRequiredFields(draft);
   const canSave =
     saveState !== "saving" &&
     isDirty &&
     missingRequiredFields.length === 0;
-  const canUndo = toast?.action === "undo" && undoDraft !== null && !isDirty;
 
   const clearToastTimeout = useCallback(() => {
     if (toastTimeoutRef.current !== null) {
@@ -225,12 +219,8 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
     }
   }, []);
 
-  const showToast = useCallback((
-    nextToast: ToastState,
-    durationMs = 2600
-  ) => {
+  const showToast = useCallback((nextToast: ToastState, durationMs = 2600) => {
     clearToastTimeout();
-
     setToast(nextToast);
 
     toastTimeoutRef.current = window.setTimeout(() => {
@@ -242,15 +232,6 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
   function dismissToast() {
     clearToastTimeout();
     setToast(null);
-  }
-
-  function toggleTag(tagKey: (typeof NOTE_TAGS)[number]["key"]) {
-    updateDraft(
-      "tags",
-      draft.tags.includes(tagKey)
-        ? draft.tags.filter((currentTag) => currentTag !== tagKey)
-        : sanitizeNoteTags([...draft.tags, tagKey])
-    );
   }
 
   useEffect(() => {
@@ -280,8 +261,8 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
         tone: "editing",
         label: "Editing",
         detail: isCreating
-          ? "a new note locally."
-          : `${getLocalNotePath(note.slug)} locally.`,
+          ? "a new project locally."
+          : `${getLocalProjectPath(project.slug)} locally.`,
       },
       3200
     );
@@ -289,7 +270,7 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
     return () => {
       clearToastTimeout();
     };
-  }, [clearToastTimeout, isCreating, note.slug, showToast]);
+  }, [clearToastTimeout, isCreating, project.slug, showToast]);
 
   useEffect(() => {
     if (!pendingLeaveHref) {
@@ -384,166 +365,6 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
     };
   }, [isDirty]);
 
-  async function handleSave(
-    options?: {
-      afterSave?: (savedNote: Note) => void;
-    }
-  ) {
-    if (!isDirty || saveState === "saving") {
-      return false;
-    }
-
-    if (missingRequiredFields.length > 0) {
-      showToast(
-        {
-          tone: "error",
-          label: "Add these first.",
-          detail: `Add ${formatFieldList(missingRequiredFields)} before ${isCreating ? "creating" : "saving"} this note.`,
-        },
-        3600
-      );
-      return false;
-    }
-
-    setSaveState("saving");
-
-    try {
-      const response = await fetch(isCreating ? "/api/notes" : `/api/notes/${persistedSlug}`, {
-        method: isCreating ? "POST" : "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          slug: draft.slug,
-          title: draft.title,
-          description: draft.description,
-          date: draft.date,
-          tags: draft.tags,
-          pinned: draft.pinned,
-          content: draft.content,
-        }),
-      });
-
-      const data = (await response.json()) as {
-        error?: string;
-        note?: Note;
-      };
-
-      if (!response.ok || !data.note) {
-        throw new Error(data.error ?? "Unable to save this note.");
-      }
-
-      const previousDraft = savedDraft;
-      const nextDraft = toDraftState(data.note);
-      const slugChanged = data.note.slug !== persistedSlug;
-
-      setDraft(nextDraft);
-      setSavedDraft(nextDraft);
-      setUndoDraft(isCreating ? null : previousDraft);
-      setEditorMode("edit");
-      setSaveState("saved");
-      showToast(
-        {
-          tone: "saved",
-          label: "Saved",
-          detail: `${getLocalNotePath(data.note.slug)} locally.`,
-          action: isCreating ? undefined : "undo",
-        },
-        5200
-      );
-
-      if (options?.afterSave) {
-        options.afterSave(data.note);
-      } else if (isCreating || slugChanged) {
-        router.replace(`/notes/${data.note.slug}/edit`);
-      }
-
-      return true;
-    } catch (error) {
-      setSaveState("error");
-      showToast(
-        {
-          tone: "error",
-          label: "Save failed.",
-          detail:
-            error instanceof Error
-              ? error.message
-              : "Unable to save this note.",
-        },
-        3200
-      );
-      return false;
-    }
-  }
-
-  async function handleUndo() {
-    if (!undoDraft || saveState === "saving") {
-      return;
-    }
-
-    setSaveState("saving");
-
-    try {
-      const response = await fetch(`/api/notes/${savedDraft.slug}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          slug: undoDraft.slug,
-          title: undoDraft.title,
-          description: undoDraft.description,
-          date: undoDraft.date,
-          tags: undoDraft.tags,
-          pinned: undoDraft.pinned,
-          content: undoDraft.content,
-        }),
-      });
-
-      const data = (await response.json()) as {
-        error?: string;
-        note?: Note;
-      };
-
-      if (!response.ok || !data.note) {
-        throw new Error(data.error ?? "Unable to undo the last save.");
-      }
-
-      const nextDraft = toDraftState(data.note);
-      const slugChanged = data.note.slug !== savedDraft.slug;
-
-      setDraft(nextDraft);
-      setSavedDraft(nextDraft);
-      setUndoDraft(null);
-      setSaveState("idle");
-      showToast(
-        {
-          tone: "editing",
-          label: "Editing",
-          detail: `${getLocalNotePath(data.note.slug)} locally.`,
-        },
-        3200
-      );
-
-      if (slugChanged) {
-        router.replace(`/notes/${data.note.slug}/edit`);
-      }
-    } catch (error) {
-      setSaveState("error");
-      showToast(
-        {
-          tone: "error",
-          label: "Undo failed.",
-          detail:
-            error instanceof Error
-              ? error.message
-              : "Unable to undo the last save.",
-        },
-        3600
-      );
-    }
-  }
-
   function updateDraft<K extends keyof DraftState>(key: K, value: DraftState[K]) {
     setDraft((currentDraft) => {
       if (currentDraft[key] === value) {
@@ -561,17 +382,100 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
     }
   }
 
-  function handlePreview() {
-    if (isCreating) {
-      return;
+  async function handleSave(
+    options?: {
+      afterSave?: (savedProject: Project) => void;
+    }
+  ) {
+    if (!isDirty || saveState === "saving") {
+      return false;
     }
 
-    leaveEditor();
+    if (missingRequiredFields.length > 0) {
+      showToast(
+        {
+          tone: "error",
+          label: "Add these first.",
+          detail: `Add ${formatFieldList(missingRequiredFields)} before ${isCreating ? "creating" : "saving"} this project.`,
+        },
+        3600
+      );
+      return false;
+    }
+
+    setSaveState("saving");
+
+    try {
+      const response = await fetch(isCreating ? "/api/work" : `/api/work/${persistedSlug}`, {
+        method: isCreating ? "POST" : "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          slug: draft.slug,
+          title: draft.title,
+          type: draft.type,
+          category: draft.category,
+          color: draft.color,
+          description: draft.description,
+          pinned: draft.pinned,
+          date: draft.date,
+          content: draft.content,
+        }),
+      });
+
+      const data = (await response.json()) as {
+        error?: string;
+        project?: Project;
+      };
+
+      if (!response.ok || !data.project) {
+        throw new Error(data.error ?? "Unable to save this project.");
+      }
+
+      const nextDraft = toDraftState(data.project);
+      const slugChanged = data.project.slug !== persistedSlug;
+
+      setDraft(nextDraft);
+      setSavedDraft(nextDraft);
+      setEditorMode("edit");
+      setSaveState("saved");
+      showToast(
+        {
+          tone: "saved",
+          label: "Saved",
+          detail: `${getLocalProjectPath(data.project.slug)} locally.`,
+        },
+        3200
+      );
+
+      if (options?.afterSave) {
+        options.afterSave(data.project);
+      } else if (isCreating || slugChanged) {
+        router.replace(`/work/${data.project.slug}/edit`);
+      }
+
+      return true;
+    } catch (error) {
+      setSaveState("error");
+      showToast(
+        {
+          tone: "error",
+          label: "Save failed.",
+          detail:
+            error instanceof Error
+              ? error.message
+              : "Unable to save this project.",
+        },
+        3200
+      );
+      return false;
+    }
   }
 
   function leaveEditor() {
     if (isCreating) {
-      router.push("/notes");
+      router.push("/work");
       return;
     }
 
@@ -579,16 +483,16 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
       `${SCROLL_KEY_PREFIX}${persistedSlug}`,
       String(window.scrollY)
     );
-    router.push(`/notes/${persistedSlug}`);
+    router.push(`/work/${persistedSlug}`);
   }
 
   function navigateToHref(targetHref: string, nextSlug = persistedSlug) {
     const resolvedHref =
-      persistedSlug && nextSlug && targetHref === `/notes/${persistedSlug}`
-        ? `/notes/${nextSlug}`
+      persistedSlug && nextSlug && targetHref === `/work/${persistedSlug}`
+        ? `/work/${nextSlug}`
         : targetHref;
 
-    if (resolvedHref === `/notes/${nextSlug}` && nextSlug) {
+    if (resolvedHref === `/work/${nextSlug}` && nextSlug) {
       window.sessionStorage.setItem(
         `${SCROLL_KEY_PREFIX}${nextSlug}`,
         String(window.scrollY)
@@ -607,6 +511,14 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
     leaveEditor();
   }
 
+  function handlePreview() {
+    if (isCreating) {
+      return;
+    }
+
+    leaveEditor();
+  }
+
   async function handleSaveAndLeave() {
     const nextHref = pendingLeaveHref;
 
@@ -617,8 +529,8 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
     setPendingLeaveHref(null);
 
     await handleSave({
-      afterSave(savedNote) {
-        navigateToHref(nextHref, savedNote.slug);
+      afterSave(savedProject) {
+        navigateToHref(nextHref, savedProject.slug);
       },
     });
   }
@@ -632,15 +544,12 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
               items={
                 isCreating
                   ? [
-                      { label: "notes", href: "/notes" },
-                      { label: activeSlugLabel },
+                      { label: "work", href: "/work" },
+                      { label: "new project" },
                     ]
                   : [
-                      { label: "notes", href: "/notes" },
-                      {
-                        label: activeSlugLabel,
-                        href: `/notes/${persistedSlug}`,
-                      },
+                      { label: "work", href: "/work" },
+                      { label: activeSlugLabel, href: `/work/${persistedSlug}` },
                       { label: "edit" },
                     ]
               }
@@ -678,209 +587,284 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
           <div className={styles.editorPaper}>
             <div className={styles.editorPaperTop}>
               <div className={styles.editorHeroFields}>
-              <div className={`${styles.guidedField} ${styles.guidedFieldMuted} ${styles.guidedFieldSlug}`}>
-                <div className={styles.guidedLead}>
-                  <div className={styles.guidedLeadMeta}>
-                    <FieldHint
-                      text="Short URL slug. Spaces become hyphens."
-                      label="Show slug help"
+                <div className={`${styles.guidedField} ${styles.guidedFieldOlive}`}>
+                  <div className={styles.guidedLead}>
+                    <div className={styles.guidedLeadMeta}>
+                      <div className={styles.metaFieldHeader}>
+                        <label className={styles.guidedLabel} htmlFor="project-slug">
+                          Slug
+                        </label>
+                        <FieldHint
+                          label="About project slug"
+                          text="Short URL slug. Spaces become hyphens."
+                          tone="olive"
+                        />
+                      </div>
+                    </div>
+                    <div className={styles.guidedLine} aria-hidden="true">
+                      <span className={styles.arrowRail}>
+                        <span className={`${styles.arrowHead} ${styles.arrowHeadTop}`}>
+                          <svg viewBox="0 0 7 9" focusable="false">
+                            <path d="M0.5 3.5L3.5 0.5L6.5 3.5" />
+                          </svg>
+                        </span>
+                        <span className={styles.arrowStem} />
+                        <span className={`${styles.arrowHead} ${styles.arrowHeadBottom}`}>
+                          <svg viewBox="0 0 7 9" focusable="false">
+                            <path d="M0.5 5.5L3.5 8.5L6.5 5.5" />
+                          </svg>
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.guidedFieldContent}>
+                    <AutoResizeTextarea
+                      id="project-slug"
+                      className={`${styles.metaInput} ${styles.guidedMetaInput} ${styles.guidedSlugInput}`}
+                      rows={1}
+                      autoComplete="off"
+                      spellCheck={false}
+                      value={draft.slug}
+                      placeholder={getProjectSlugPlaceholder()}
+                      onChange={(event) => {
+                        updateDraft("slug", sanitizeSlugInput(event.target.value));
+                      }}
+                      onBlur={(event) => {
+                        const normalizedSlug = normalizeSlugInput(event.target.value);
+
+                        updateDraft(
+                          "slug",
+                          normalizedSlug ||
+                            (isCreating ? getProjectSlugPlaceholder() : savedDraft.slug)
+                        );
+                      }}
                     />
-                    <label className={styles.guidedLabel} htmlFor="note-slug">
-                      Slug
-                    </label>
-                  </div>
-                  <div className={styles.guidedLine} aria-hidden="true">
-                    <DoubleArrowLine />
                   </div>
                 </div>
-                <div className={styles.guidedFieldContent}>
-                  <input
-                    id="note-slug"
-                    className={`${styles.metaInput} ${styles.guidedMetaInput} ${styles.guidedSlugInput}`}
-                    type="text"
-                    autoComplete="off"
-                    inputMode="text"
-                    autoCapitalize="none"
-                    autoCorrect="off"
-                    spellCheck={false}
-                    placeholder="testing-mdx-features"
-                    value={draft.slug}
-                    onChange={(event) => {
-                      updateDraft("slug", sanitizeSlugInput(event.target.value));
-                    }}
-                    onBlur={() => {
-                      updateDraft("slug", normalizeSlugInput(draft.slug));
-                    }}
-                  />
-                </div>
-              </div>
 
-              <div className={`${styles.guidedField} ${styles.guidedFieldMuted} ${styles.guidedFieldTitle}`}>
-                <div className={styles.guidedLead}>
-                  <div className={styles.guidedLeadMeta}>
-                    <label className={styles.guidedLabel} htmlFor="note-title">
-                      Title
-                    </label>
+                <div className={`${styles.guidedField} ${styles.guidedFieldMuted} ${styles.guidedFieldTitle}`}>
+                  <div className={styles.guidedLead}>
+                    <div className={styles.guidedLeadMeta}>
+                      <label className={styles.guidedLabel} htmlFor="project-title">
+                        Title
+                      </label>
+                    </div>
+                    <div className={styles.guidedLine} aria-hidden="true">
+                      <DoubleArrowLine />
+                    </div>
                   </div>
-                  <div className={styles.guidedLine} aria-hidden="true">
-                    <DoubleArrowLine />
-                  </div>
-                </div>
-                <div className={styles.guidedFieldContent}>
-                  <AutoResizeTextarea
-                    id="note-title"
-                    className={`${styles.titleInput} ${styles.guidedTitleInput}`}
-                    rows={1}
-                    autoComplete="off"
-                    spellCheck
-                    value={draft.title}
-                    onChange={(event) => {
-                      updateDraft("title", event.target.value);
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div className={`${styles.guidedField} ${styles.guidedFieldMuted} ${styles.guidedFieldTags}`}>
-                <div className={styles.guidedLead}>
-                  <div className={styles.guidedLeadMeta}>
-                    <FieldHint
-                      text="Choose one or more note categories."
-                      label="Show tags help"
+                  <div className={styles.guidedFieldContent}>
+                    <AutoResizeTextarea
+                      id="project-title"
+                      className={`${styles.titleInput} ${styles.guidedTitleInput}`}
+                      rows={1}
+                      autoComplete="off"
+                      spellCheck
+                      value={draft.title}
+                      onChange={(event) => {
+                        updateDraft("title", event.target.value);
+                      }}
                     />
-                    <span id="note-tags" className={styles.guidedLabel}>
-                      Tags
-                    </span>
-                  </div>
-                  <div className={styles.guidedLine} aria-hidden="true">
-                    <DoubleArrowLine />
                   </div>
                 </div>
-                <div className={styles.guidedFieldContent}>
-                  <div className={styles.tagChoiceGrid} role="group" aria-labelledby="note-tags">
-                    {NOTE_TAGS.map((tag) => {
-                      const isActive = draft.tags.includes(tag.key);
 
-                      return (
+                <div className={`${styles.guidedField} ${styles.guidedFieldMuted}`}>
+                  <div className={styles.guidedLead}>
+                    <div className={styles.guidedLeadMeta}>
+                      <label className={styles.guidedLabel}>Type</label>
+                    </div>
+                    <div className={styles.guidedLine} aria-hidden="true">
+                      <DoubleArrowLine />
+                    </div>
+                  </div>
+                  <div className={styles.guidedFieldContent}>
+                    <div className={styles.tagChoiceGrid}>
+                      {PROJECT_TYPES.map((typeOption) => (
                         <button
-                          key={tag.key}
+                          key={typeOption.key}
                           type="button"
-                          className={`${styles.tagChoiceChip} ${isActive ? styles.tagChoiceChipActive : ""}`}
-                          style={{ ["--tag-choice-color" as string]: getNoteTagColorCssValueForColor(tag.color) }}
-                          aria-pressed={isActive}
+                          className={`${styles.tagChoiceChip} ${draft.type === typeOption.key ? styles.tagChoiceChipActive : ""}`}
+                          style={
+                            {
+                              "--tag-choice-color": getProjectColorCssValue(
+                                typeToneByKey[typeOption.key]
+                              ),
+                            } as CSSProperties
+                          }
                           onClick={() => {
-                            toggleTag(tag.key);
+                            updateDraft("type", typeOption.key);
                           }}
                         >
-                          {tag.label}
+                          {typeOption.label}
                         </button>
-                      );
-                    })}
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className={`${styles.guidedField} ${styles.guidedFieldMuted} ${styles.guidedFieldDescription}`}>
-                <div className={styles.guidedLead}>
-                  <div className={styles.guidedLeadMeta}>
-                    <label className={styles.guidedLabel} htmlFor="note-description">
-                      Description
-                    </label>
+                <div className={`${styles.guidedField} ${styles.guidedFieldOlive}`}>
+                  <div className={styles.guidedLead}>
+                    <div className={styles.guidedLeadMeta}>
+                      <div className={styles.metaFieldHeader}>
+                        <label className={styles.guidedLabel} htmlFor="project-category">
+                          Category
+                        </label>
+                        <FieldHint
+                          label="About project category"
+                          text="This is the short label shown above the project title."
+                          tone="olive"
+                        />
+                      </div>
+                    </div>
+                    <div className={styles.guidedLine} aria-hidden="true">
+                      <DoubleArrowLine />
+                    </div>
                   </div>
-                  <div className={styles.guidedLine} aria-hidden="true">
-                    <DoubleArrowLine />
+                  <div className={styles.guidedFieldContent}>
+                    <AutoResizeTextarea
+                      id="project-category"
+                      className={`${styles.metaInput} ${styles.guidedMetaInput} ${styles.guidedProjectCategoryInput}`}
+                      rows={1}
+                      autoComplete="off"
+                      spellCheck
+                      value={draft.category}
+                      onChange={(event) => {
+                        updateDraft("category", event.target.value);
+                      }}
+                    />
                   </div>
                 </div>
-                <div className={styles.guidedFieldContent}>
-                  <AutoResizeTextarea
-                    id="note-description"
-                    className={`${styles.descriptionInput} ${styles.guidedDescriptionInput}`}
-                    rows={1}
-                    autoComplete="off"
-                    spellCheck
-                    value={draft.description}
-                    onChange={(event) => {
-                      updateDraft("description", event.target.value);
-                    }}
-                  />
-                </div>
-              </div>
 
-              <div className={`${styles.guidedField} ${styles.guidedFieldMuted} ${styles.guidedFieldPin}`}>
-                <div className={styles.guidedLead}>
-                  <div className={styles.guidedLeadMeta}>
-                    <label className={styles.guidedLabel} htmlFor="note-pinned">
-                      Pin
-                    </label>
+                <div className={`${styles.guidedField} ${styles.guidedFieldMuted}`}>
+                  <div className={styles.guidedLead}>
+                    <div className={styles.guidedLeadMeta}>
+                      <label className={styles.guidedLabel}>Color</label>
+                    </div>
+                    <div className={styles.guidedLine} aria-hidden="true">
+                      <DoubleArrowLine />
+                    </div>
                   </div>
-                  <div className={styles.guidedLine} aria-hidden="true">
-                    <DoubleArrowLine />
+                  <div className={styles.guidedFieldContent}>
+                    <div className={styles.tagChoiceGrid}>
+                      {PROJECT_COLOR_OPTIONS.map((colorOption) => (
+                        <button
+                          key={colorOption.key}
+                          type="button"
+                          className={`${styles.tagChoiceChip} ${draft.color === colorOption.key ? styles.tagChoiceChipActive : ""}`}
+                          style={
+                            {
+                              "--tag-choice-color": getProjectColorCssValue(colorOption.key),
+                            } as CSSProperties
+                          }
+                          onClick={() => {
+                            updateDraft("color", colorOption.key);
+                          }}
+                        >
+                          {colorOption.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div className={styles.guidedFieldContent}>
-                  <div className={styles.pinChoiceRow} role="radiogroup" aria-labelledby="note-pinned">
-                    <span id="note-pinned" className={styles.srOnly}>
-                      Pin note
-                    </span>
-                    <button
-                      type="button"
-                      className={`${styles.pinChoiceButton} ${styles.pinChoiceYes} ${draft.pinned ? styles.pinChoiceActiveYes : ""}`}
-                      aria-pressed={draft.pinned}
-                      onClick={() => {
-                        updateDraft("pinned", true);
+
+                <div className={`${styles.guidedField} ${styles.guidedFieldMuted} ${styles.guidedFieldDescription}`}>
+                  <div className={styles.guidedLead}>
+                    <div className={styles.guidedLeadMeta}>
+                      <label className={styles.guidedLabel} htmlFor="project-description">
+                        Description
+                      </label>
+                    </div>
+                    <div className={styles.guidedLine} aria-hidden="true">
+                      <DoubleArrowLine />
+                    </div>
+                  </div>
+                  <div className={styles.guidedFieldContent}>
+                    <AutoResizeTextarea
+                      id="project-description"
+                      className={`${styles.descriptionInput} ${styles.guidedDescriptionInput}`}
+                      rows={1}
+                      autoComplete="off"
+                      spellCheck
+                      value={draft.description}
+                      onChange={(event) => {
+                        updateDraft("description", event.target.value);
                       }}
-                    >
-                      Yes
-                    </button>
-                    <span className={styles.pinChoiceDivider} aria-hidden="true">
-                      /
-                    </span>
-                    <button
-                      type="button"
-                      className={`${styles.pinChoiceButton} ${styles.pinChoiceNo} ${!draft.pinned ? styles.pinChoiceActiveNo : ""}`}
-                      aria-pressed={!draft.pinned}
-                      onClick={() => {
-                        updateDraft("pinned", false);
+                    />
+                  </div>
+                </div>
+
+                <div className={`${styles.guidedField} ${styles.guidedFieldMuted} ${styles.guidedFieldPin}`}>
+                  <div className={styles.guidedLead}>
+                    <div className={styles.guidedLeadMeta}>
+                      <label className={styles.guidedLabel}>Pin</label>
+                    </div>
+                    <div className={styles.guidedLine} aria-hidden="true">
+                      <DoubleArrowLine />
+                    </div>
+                  </div>
+                  <div className={styles.guidedFieldContent}>
+                    <div className={styles.pinChoiceRow}>
+                      <button
+                        type="button"
+                        className={`${styles.pinChoiceButton} ${styles.pinChoiceYes} ${draft.pinned ? styles.pinChoiceActiveYes : ""}`}
+                        onClick={() => {
+                          updateDraft("pinned", true);
+                        }}
+                        aria-pressed={draft.pinned}
+                      >
+                        Yes
+                      </button>
+                      <span className={styles.pinChoiceDivider} aria-hidden="true">
+                        /
+                      </span>
+                      <button
+                        type="button"
+                        className={`${styles.pinChoiceButton} ${styles.pinChoiceNo} ${!draft.pinned ? styles.pinChoiceActiveNo : ""}`}
+                        onClick={() => {
+                          updateDraft("pinned", false);
+                        }}
+                        aria-pressed={!draft.pinned}
+                      >
+                        No
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`${styles.guidedField} ${styles.guidedFieldMuted}`}>
+                  <div className={styles.guidedLead}>
+                    <div className={styles.guidedLeadMeta}>
+                      <label className={styles.guidedLabel} htmlFor="project-date">
+                        Date
+                      </label>
+                    </div>
+                    <div className={styles.guidedLine} aria-hidden="true">
+                      <DoubleArrowLine />
+                    </div>
+                  </div>
+                  <div className={styles.guidedFieldContent}>
+                    <AutoResizeTextarea
+                      id="project-date"
+                      className={`${styles.metaInput} ${styles.guidedMetaInput} ${styles.guidedDateInput}`}
+                      rows={1}
+                      autoComplete="off"
+                      spellCheck={false}
+                      value={draft.date}
+                      onChange={(event) => {
+                        updateDraft("date", event.target.value);
                       }}
-                    >
-                      No
-                    </button>
+                    />
                   </div>
-                </div>
-              </div>
-              <div className={`${styles.guidedField} ${styles.guidedFieldMuted} ${styles.guidedFieldDate}`}>
-                <div className={styles.guidedLead}>
-                  <div className={styles.guidedLeadMeta}>
-                    <label className={styles.guidedLabel} htmlFor="note-date">
-                      Date
-                    </label>
-                  </div>
-                  <div className={styles.guidedLine} aria-hidden="true">
-                    <DoubleArrowLine />
-                  </div>
-                </div>
-                <div className={styles.guidedFieldContent}>
-                  <input
-                    id="note-date"
-                    className={`${styles.metaInput} ${styles.guidedMetaInput} ${styles.guidedDateInput}`}
-                    type="text"
-                    autoComplete="off"
-                    value={draft.date}
-                    onChange={(event) => {
-                      updateDraft("date", event.target.value);
-                    }}
-                  />
                 </div>
               </div>
             </div>
-          </div>
 
             <Divider className={styles.editorPaperDivider} />
 
             <div className={styles.editorPaperBody}>
               <div className={styles.bodyField}>
                 <div className={styles.bodyHeader}>
-                  <label className={styles.fieldLabel} htmlFor="note-content">
+                  <label className={styles.fieldLabel} htmlFor="project-content">
                     Body
                   </label>
                   <div className={styles.bodyTools}>
@@ -895,8 +879,7 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
 
                 <div className={styles.bodyFrame}>
                   <AutoResizeTextarea
-                    id="note-content"
-                    ref={bodyTextareaRef}
+                    id="project-content"
                     className={styles.bodyInput}
                     rows={18}
                     autoComplete="off"
@@ -929,19 +912,6 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
           </div>
 
           <div className={styles.toastActions} style={toastActionsStyle}>
-            {canUndo ? (
-              <button
-                type="button"
-                className={styles.toastButton}
-                style={{ display: "inline-flex", alignItems: "center", lineHeight: 1 }}
-                onClick={() => {
-                  void handleUndo();
-                }}
-              >
-                Undo
-              </button>
-            ) : null}
-
             <span className={styles.toastDivider} aria-hidden="true" />
 
             <button
@@ -973,14 +943,14 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
             className={editorial.utilityConfirmPanel}
             role="alertdialog"
             aria-modal="true"
-            aria-labelledby="leave-note-title"
-            aria-describedby="leave-note-title"
+            aria-labelledby="project-leave-title"
+            aria-describedby="project-leave-title"
             onClick={(event) => {
               event.stopPropagation();
             }}
           >
             <div className={editorial.utilityConfirmContent}>
-              <p id="leave-note-title" className={editorial.utilityConfirmText}>
+              <p id="project-leave-title" className={editorial.utilityConfirmText}>
                 Save changes before leaving? You can also discard them.
               </p>
             </div>
@@ -999,13 +969,11 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
                 className={`${editorial.utilityLink} ${editorial.utilityButton} ${editorial.utilityLinkDanger}`}
                 onClick={() => {
                   const nextHref = pendingLeaveHref;
-
-                  if (!nextHref) {
-                    return;
-                  }
-
                   setPendingLeaveHref(null);
-                  navigateToHref(nextHref);
+
+                  if (nextHref) {
+                    navigateToHref(nextHref);
+                  }
                 }}
               >
                 Discard
@@ -1016,14 +984,31 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
                 onClick={() => {
                   void handleSaveAndLeave();
                 }}
-                disabled={saveState === "saving"}
               >
-                {saveState === "saving" ? "Saving..." : "Save"}
+                Save
               </button>
             </div>
           </div>
         </div>
       ) : null}
     </>
+  );
+}
+
+function DoubleArrowLine() {
+  return (
+    <span className={styles.arrowRail} aria-hidden="true">
+      <span className={`${styles.arrowHead} ${styles.arrowHeadTop}`}>
+        <svg viewBox="0 0 7 9" focusable="false">
+          <path d="M0.5 3.5L3.5 0.5L6.5 3.5" />
+        </svg>
+      </span>
+      <span className={styles.arrowStem} />
+      <span className={`${styles.arrowHead} ${styles.arrowHeadBottom}`}>
+        <svg viewBox="0 0 7 9" focusable="false">
+          <path d="M0.5 5.5L3.5 8.5L6.5 5.5" />
+        </svg>
+      </span>
+    </span>
   );
 }

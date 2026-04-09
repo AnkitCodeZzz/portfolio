@@ -14,6 +14,7 @@ import Breadcrumbs from "./Breadcrumbs";
 import Divider from "./Divider";
 import editorial from "../styles/editorial.module.css";
 import styles from "../styles/noteEditor.module.css";
+import { getNoteTagColorCssValueForColor, NOTE_TAGS, sanitizeNoteTags } from "../lib/noteTags";
 import type { Note } from "../lib/notes";
 
 type NoteEditorProps = {
@@ -26,7 +27,7 @@ type DraftState = {
   title: string;
   description: string;
   date: string;
-  tags: string;
+  tags: string[];
   pinned: boolean;
   content: string;
 };
@@ -182,7 +183,7 @@ function MdxGuidePopover() {
             setIsOpen(true);
           }}
         >
-          View MDX guide
+          MDX guide
         </button>
       </div>
 
@@ -217,6 +218,8 @@ function MdxGuidePopover() {
               </button>
             </div>
 
+            <Divider className={styles.guidePanelDivider} />
+
             <ul className={styles.guideList}>
               {MDX_GUIDE_ITEMS.map((item) => (
                 <li key={item.label} className={styles.guideListItem}>
@@ -238,17 +241,10 @@ function toDraftState(note: Note): DraftState {
     title: note.title,
     description: note.description,
     date: note.date,
-    tags: note.tags.join(", "),
+    tags: sanitizeNoteTags(note.tags),
     pinned: note.pinned,
     content: note.content,
   };
-}
-
-function parseTags(value: string) {
-  return value
-    .split(",")
-    .map((tag) => tag.trim())
-    .filter(Boolean);
 }
 
 function sanitizeSlugInput(value: string) {
@@ -286,7 +282,7 @@ function getMissingRequiredFields(draft: DraftState) {
   return [
     !draft.slug.trim() && "slug",
     !draft.title.trim() && "title",
-    parseTags(draft.tags).length === 0 && "tags",
+    draft.tags.length === 0 && "tags",
     !draft.description.trim() && "description",
     !draft.date.trim() && "date",
   ].filter(Boolean) as string[];
@@ -343,9 +339,10 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
   const [undoDraft, setUndoDraft] = useState<DraftState | null>(null);
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [toast, setToast] = useState<ToastState | null>(null);
+  const [pendingLeaveHref, setPendingLeaveHref] = useState<string | null>(null);
 
   const isCreating = editorMode === "create";
-  const isDirty = isCreating || JSON.stringify(draft) !== JSON.stringify(savedDraft);
+  const isDirty = JSON.stringify(draft) !== JSON.stringify(savedDraft);
   const persistedSlug = savedDraft.slug;
   const activeSlug = persistedSlug || draft.slug;
   const activeSlugLabel = formatSlugLabel(activeSlug) || "new note";
@@ -382,8 +379,23 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
     setToast(null);
   }
 
+  function toggleTag(tagKey: (typeof NOTE_TAGS)[number]["key"]) {
+    updateDraft(
+      "tags",
+      draft.tags.includes(tagKey)
+        ? draft.tags.filter((currentTag) => currentTag !== tagKey)
+        : sanitizeNoteTags([...draft.tags, tagKey])
+    );
+  }
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (pendingLeaveHref && event.key === "Escape") {
+        event.preventDefault();
+        setPendingLeaveHref(null);
+        return;
+      }
+
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s") {
         event.preventDefault();
         void handleSave();
@@ -414,9 +426,106 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
     };
   }, [clearToastTimeout, isCreating, note.slug, showToast]);
 
-  async function handleSave() {
-    if (!isDirty || saveState === "saving") {
+  useEffect(() => {
+    if (!pendingLeaveHref) {
       return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [pendingLeaveHref]);
+
+  useEffect(() => {
+    if (!isDirty) {
+      return;
+    }
+
+    function handleBeforeUnload(event: BeforeUnloadEvent) {
+      event.preventDefault();
+      event.returnValue = "";
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isDirty]);
+
+  useEffect(() => {
+    if (!isDirty) {
+      return;
+    }
+
+    function handleDocumentClick(event: globalThis.MouseEvent) {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return;
+      }
+
+      const target = event.target;
+
+      if (!(target instanceof Element)) {
+        return;
+      }
+
+      const anchor = target.closest("a[href]");
+
+      if (!(anchor instanceof HTMLAnchorElement)) {
+        return;
+      }
+
+      if (
+        anchor.target === "_blank" ||
+        anchor.hasAttribute("download") ||
+        anchor.getAttribute("rel")?.includes("external")
+      ) {
+        return;
+      }
+
+      const nextUrl = new URL(anchor.href, window.location.href);
+      const currentUrl = new URL(window.location.href);
+
+      if (nextUrl.href === currentUrl.href) {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (nextUrl.origin === currentUrl.origin) {
+        setPendingLeaveHref(
+          `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`
+        );
+        return;
+      }
+
+      setPendingLeaveHref(nextUrl.href);
+    }
+
+    document.addEventListener("click", handleDocumentClick, true);
+
+    return () => {
+      document.removeEventListener("click", handleDocumentClick, true);
+    };
+  }, [isDirty]);
+
+  async function handleSave(
+    options?: {
+      afterSave?: (savedNote: Note) => void;
+    }
+  ) {
+    if (!isDirty || saveState === "saving") {
+      return false;
     }
 
     if (missingRequiredFields.length > 0) {
@@ -428,7 +537,7 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
         },
         3600
       );
-      return;
+      return false;
     }
 
     setSaveState("saving");
@@ -444,7 +553,7 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
           title: draft.title,
           description: draft.description,
           date: draft.date,
-          tags: parseTags(draft.tags),
+          tags: draft.tags,
           pinned: draft.pinned,
           content: draft.content,
         }),
@@ -478,9 +587,13 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
         5200
       );
 
-      if (isCreating || slugChanged) {
+      if (options?.afterSave) {
+        options.afterSave(data.note);
+      } else if (isCreating || slugChanged) {
         router.replace(`/notes/${data.note.slug}/edit`);
       }
+
+      return true;
     } catch (error) {
       setSaveState("error");
       showToast(
@@ -494,6 +607,7 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
         },
         3200
       );
+      return false;
     }
   }
 
@@ -515,7 +629,7 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
           title: undoDraft.title,
           description: undoDraft.description,
           date: undoDraft.date,
-          tags: parseTags(undoDraft.tags),
+          tags: undoDraft.tags,
           pinned: undoDraft.pinned,
           content: undoDraft.content,
         }),
@@ -603,8 +717,45 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
     router.push(`/notes/${persistedSlug}`);
   }
 
+  function navigateToHref(targetHref: string, nextSlug = persistedSlug) {
+    const resolvedHref =
+      persistedSlug && nextSlug && targetHref === `/notes/${persistedSlug}`
+        ? `/notes/${nextSlug}`
+        : targetHref;
+
+    if (resolvedHref === `/notes/${nextSlug}` && nextSlug) {
+      window.sessionStorage.setItem(
+        `${SCROLL_KEY_PREFIX}${nextSlug}`,
+        String(window.scrollY)
+      );
+    }
+
+    if (resolvedHref.startsWith("/")) {
+      router.push(resolvedHref);
+      return;
+    }
+
+    window.location.assign(resolvedHref);
+  }
+
   function handleCancel() {
     leaveEditor();
+  }
+
+  async function handleSaveAndLeave() {
+    const nextHref = pendingLeaveHref;
+
+    if (!nextHref) {
+      return;
+    }
+
+    setPendingLeaveHref(null);
+
+    await handleSave({
+      afterSave(savedNote) {
+        navigateToHref(nextHref, savedNote.slug);
+      },
+    });
   }
 
   return (
@@ -729,29 +880,38 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
                 <div className={styles.guidedLead}>
                   <div className={styles.guidedLeadMeta}>
                     <FieldHint
-                      text="Separate multiple tags with commas."
+                      text="Choose one or more note categories."
                       label="Show tags help"
                     />
-                    <label className={styles.guidedLabel} htmlFor="note-tags">
+                    <span id="note-tags" className={styles.guidedLabel}>
                       Tags
-                    </label>
+                    </span>
                   </div>
                   <div className={styles.guidedLine} aria-hidden="true">
                     <DoubleArrowLine />
                   </div>
                 </div>
                 <div className={styles.guidedFieldContent}>
-                  <input
-                    id="note-tags"
-                    className={`${styles.metaInput} ${styles.guidedTagsInput}`}
-                    type="text"
-                    autoComplete="off"
-                    placeholder="design, ai, writing"
-                    value={draft.tags}
-                    onChange={(event) => {
-                      updateDraft("tags", event.target.value);
-                    }}
-                  />
+                  <div className={styles.tagChoiceGrid} role="group" aria-labelledby="note-tags">
+                    {NOTE_TAGS.map((tag) => {
+                      const isActive = draft.tags.includes(tag.key);
+
+                      return (
+                        <button
+                          key={tag.key}
+                          type="button"
+                          className={`${styles.tagChoiceChip} ${isActive ? styles.tagChoiceChipActive : ""}`}
+                          style={{ ["--tag-choice-color" as string]: getNoteTagColorCssValueForColor(tag.color) }}
+                          aria-pressed={isActive}
+                          onClick={() => {
+                            toggleTag(tag.key);
+                          }}
+                        >
+                          {tag.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
@@ -859,7 +1019,11 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
                     Body
                   </label>
                   <div className={styles.bodyTools}>
-                    <span className={styles.bodyMeta}>Cmd + S to save.</span>
+                    <span className={`${styles.bodyMeta} ${styles.bodyShortcut}`}>
+                      <span className={styles.bodyShortcutCommand}>⌘</span>
+                      <span className={styles.bodyShortcutKeys}>+ S</span>
+                    </span>
+                    <span className={styles.bodyToolDivider} aria-hidden="true" />
                     <MdxGuidePopover />
                   </div>
                 </div>
@@ -929,6 +1093,69 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
                 </svg>
               </span>
             </button>
+          </div>
+        </div>
+      ) : null}
+
+      {pendingLeaveHref ? (
+        <div
+          className={editorial.utilityConfirmOverlay}
+          onClick={() => {
+            setPendingLeaveHref(null);
+          }}
+        >
+          <div
+            className={editorial.utilityConfirmPanel}
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="leave-note-title"
+            aria-describedby="leave-note-title"
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+          >
+            <div className={editorial.utilityConfirmContent}>
+              <p id="leave-note-title" className={editorial.utilityConfirmText}>
+                Save changes before leaving? You can also discard them.
+              </p>
+            </div>
+            <div className={`${editorial.utilityConfirmActions} ${styles.leaveConfirmActions}`}>
+              <button
+                type="button"
+                className={`${editorial.utilityLink} ${editorial.utilityButton}`}
+                onClick={() => {
+                  setPendingLeaveHref(null);
+                }}
+              >
+                Stay
+              </button>
+              <button
+                type="button"
+                className={`${editorial.utilityLink} ${editorial.utilityButton} ${editorial.utilityLinkDanger}`}
+                onClick={() => {
+                  const nextHref = pendingLeaveHref;
+
+                  if (!nextHref) {
+                    return;
+                  }
+
+                  setPendingLeaveHref(null);
+                  navigateToHref(nextHref);
+                }}
+              >
+                Discard
+              </button>
+              <button
+                type="button"
+                className={`${editorial.utilityLink} ${editorial.utilityButton} ${styles.leaveConfirmSave}`}
+                onClick={() => {
+                  void handleSaveAndLeave();
+                }}
+                disabled={saveState === "saving"}
+              >
+                {saveState === "saving" ? "Saving..." : "Save"}
+              </button>
+            </div>
           </div>
         </div>
       ) : null}

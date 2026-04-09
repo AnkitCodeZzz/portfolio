@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { Fragment } from "react";
+import { Fragment, type MouseEvent } from "react";
 import editorial from "../styles/editorial.module.css";
 
 type BreadcrumbItem = {
   label: string;
   href?: string;
+  onClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
 };
 
 type BreadcrumbsProps = {
@@ -27,7 +28,11 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
               }`.trim()}
             >
               {item.href && !isLast ? (
-                <Link href={item.href} className={editorial.breadcrumbLink}>
+                <Link
+                  href={item.href}
+                  className={editorial.breadcrumbLink}
+                  onClick={item.onClick}
+                >
                   {hasSeparator ? (
                     <span className={editorial.breadcrumbSeparator} aria-hidden="true">
                       /

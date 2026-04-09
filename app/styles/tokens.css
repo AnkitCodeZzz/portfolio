@@ -134,10 +134,12 @@
   --site-highlight-stroke: rgba(47, 128, 255, 0.32);
   --site-tag-olive: #869966;
   --site-tag-violet: #866699;
+  --site-tag-purple: #666A99;
   --site-tag-blue: #669999;
   --site-tag-brown: #998866;
   --site-tag-rose: #996666;
-  --site-tag-sage: #8fada0;
+  --site-selection-fill: color-mix(in srgb, var(--site-tag-olive) 26%, white);
+  --site-selection-ink: var(--site-ink);
 
   /* ==================== COLORS ==================== */
   --color-bg: var(--site-bg);
@@ -158,11 +160,11 @@
   --color-text-secondary: var(--site-muted);
   --color-text-muted: var(--site-muted-soft);
 
-  --color-accent: var(--site-tag-sage);
-  --color-accent-bg: color-mix(in srgb, var(--site-tag-sage) 18%, white);
+  --color-accent: var(--site-tag-olive);
+  --color-accent-bg: color-mix(in srgb, var(--site-tag-olive) 18%, white);
 
-  --color-a: var(--site-tag-sage);
-  --color-a-bg: color-mix(in srgb, var(--site-tag-sage) 18%, white);
+  --color-a: var(--site-tag-olive);
+  --color-a-bg: color-mix(in srgb, var(--site-tag-olive) 18%, white);
   --color-b: var(--site-tag-blue);
   --color-b-bg: color-mix(in srgb, var(--site-tag-blue) 18%, white);
   --color-c: var(--site-tag-violet);

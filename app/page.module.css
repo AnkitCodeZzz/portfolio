@@ -560,6 +560,10 @@ a.sectionAction {
   color: var(--site-tag-violet);
 }
 
+.tagPurple {
+  color: var(--site-tag-purple);
+}
+
 .notesMeta {
   display: inline-flex;
   flex-wrap: wrap;

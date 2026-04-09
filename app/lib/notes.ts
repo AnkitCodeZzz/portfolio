@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import { getInvalidNoteTags, sanitizeNoteTags } from "./noteTags";
 
 const notesDir = path.join(process.cwd(), "content/notes");
 const NOTE_SLUG_PATTERN = /^[a-z0-9_-]+$/i;
@@ -40,7 +41,7 @@ function serializeNote(input: NoteInput) {
   const frontmatter = {
     title: input.title,
     date: input.date,
-    tags: input.tags,
+    tags: sanitizeNoteTags(input.tags),
     description: input.description,
     ...(input.pinned ? { pinned: true } : {}),
   };
@@ -57,7 +58,7 @@ function getMissingRequiredNoteFields(input: Pick<NoteInput, "slug" | "title" | 
     !input.slug.trim() && "slug",
     !input.title.trim() && "title",
     !input.date.trim() && "date",
-    input.tags.length === 0 && "tags",
+    sanitizeNoteTags(input.tags).length === 0 && "tags",
     !input.description.trim() && "description",
   ].filter(Boolean) as string[];
 }
@@ -126,7 +127,7 @@ export function getAllNotes(): NoteMetadata[] {
         slug,
         title: data.title ?? "",
         date: data.date ?? "",
-        tags: data.tags ?? [],
+        tags: sanitizeNoteTags(data.tags ?? []),
         description: data.description ?? "",
         pinned: data.pinned ?? false,
       };
@@ -150,7 +151,7 @@ export function getNote(slug: string): Note | null {
     slug,
     title: data.title ?? "",
     date: data.date ?? "",
-    tags: data.tags ?? [],
+    tags: sanitizeNoteTags(data.tags ?? []),
     description: data.description ?? "",
     pinned: data.pinned ?? false,
     content,
@@ -166,6 +167,7 @@ export function saveNote(slug: string, input: NoteInput): Note | null {
 
   const nextSlug = input.slug.trim();
   const nextFilePath = getNoteFilePath(nextSlug);
+  const invalidTags = getInvalidNoteTags(input.tags);
   const missingFields = getMissingRequiredNoteFields({
     slug: nextSlug,
     title: input.title,
@@ -178,6 +180,10 @@ export function saveNote(slug: string, input: NoteInput): Note | null {
     throw new NoteSaveError(
       `Add ${formatFieldList(missingFields)} before saving this note.`
     );
+  }
+
+  if (invalidTags.length > 0) {
+    throw new NoteSaveError("Use only the available note categories for tags.");
   }
 
   if (!nextFilePath) {
@@ -202,6 +208,7 @@ export function saveNote(slug: string, input: NoteInput): Note | null {
 export function createNote(input: NoteInput): Note {
   const nextSlug = input.slug.trim();
   const nextFilePath = getNoteFilePath(nextSlug);
+  const invalidTags = getInvalidNoteTags(input.tags);
   const missingFields = getMissingRequiredNoteFields({
     slug: nextSlug,
     title: input.title,
@@ -214,6 +221,10 @@ export function createNote(input: NoteInput): Note {
     throw new NoteSaveError(
       `Add ${formatFieldList(missingFields)} before creating this note.`
     );
+  }
+
+  if (invalidTags.length > 0) {
+    throw new NoteSaveError("Use only the available note categories for tags.");
   }
 
   if (!nextFilePath) {

@@ -10,16 +10,9 @@ import PageFrame from "../../components/PageFrame";
 import PinIcon from "../../components/PinIcon";
 import { splitMdxIntoSections } from "../../lib/mdxSections";
 import { getAllNotes, getNote, getNoteDisplayTitle } from "../../lib/notes";
+import { getNoteTagColorCssValue, getNoteTagLabel } from "../../lib/noteTags";
 import editorial from "../../styles/editorial.module.css";
 import homeStyles from "../../page.module.css";
-
-const tagClasses = [
-  homeStyles.tagOlive,
-  homeStyles.tagViolet,
-  homeStyles.tagBlue,
-  homeStyles.tagBrown,
-  homeStyles.tagRose,
-];
 
 function formatSlugLabel(slug: string) {
   return slug.replace(/[-_]+/g, " ").trim().toLowerCase();
@@ -84,9 +77,10 @@ export default async function NotePage({
                         <span className={homeStyles.tagMetaItem} key={`${note.slug}-header-${tag}`}>
                           <span
                             data-ruler-tag
-                            className={`${editorial.tag} ${tagClasses[tagIndex % tagClasses.length]}`}
+                            className={editorial.tag}
+                            style={{ color: getNoteTagColorCssValue(tag) }}
                           >
-                            {tag}
+                            {getNoteTagLabel(tag)}
                           </span>
                           {tagIndex < note.tags.length - 1 ? <span className={homeStyles.dot}>•</span> : null}
                         </span>

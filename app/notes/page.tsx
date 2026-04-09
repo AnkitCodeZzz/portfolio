@@ -3,16 +3,9 @@ import Divider from "../components/Divider";
 import PinIcon from "../components/PinIcon";
 import PageFrame from "../components/PageFrame";
 import { getAllNotes, getNoteDisplayTitle } from "../lib/notes";
+import { getNoteTagColorCssValue, getNoteTagLabel } from "../lib/noteTags";
 import editorial from "../styles/editorial.module.css";
 import homeStyles from "../page.module.css";
-
-const tagClasses = [
-  homeStyles.tagOlive,
-  homeStyles.tagViolet,
-  homeStyles.tagBlue,
-  homeStyles.tagBrown,
-  homeStyles.tagRose,
-];
 
 export default function NotesPage() {
   const notes = getAllNotes();
@@ -58,9 +51,10 @@ export default function NotesPage() {
                         <span className={homeStyles.tagMetaItem} key={`${note.slug}-${tag}`}>
                           <span
                             data-ruler-tag
-                            className={`${homeStyles.noteTag} ${tagClasses[tagIndex % tagClasses.length]}`}
+                            className={homeStyles.noteTag}
+                            style={{ color: getNoteTagColorCssValue(tag) }}
                           >
-                            {tag}
+                            {getNoteTagLabel(tag)}
                           </span>
                           {tagIndex < note.tags.length - 1 ? <span className={homeStyles.dot}>•</span> : null}
                         </span>

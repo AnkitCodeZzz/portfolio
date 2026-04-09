@@ -14,6 +14,20 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+html::selection,
+body::selection,
+*::selection {
+  background: var(--site-selection-fill);
+  color: var(--site-selection-ink);
+}
+
+html::-moz-selection,
+body::-moz-selection,
+*::-moz-selection {
+  background: var(--site-selection-fill);
+  color: var(--site-selection-ink);
+}
+
 *,
 *::before,
 *::after {
@@ -81,8 +95,8 @@ body {
   }
 
   .prose blockquote {
-    border-left: 3px solid var(--site-tag-sage);
-    background: color-mix(in srgb, var(--site-tag-sage) 12%, white);
+    border-left: 3px solid var(--site-tag-olive);
+    background: color-mix(in srgb, var(--site-tag-olive) 12%, white);
     padding: var(--site-space-meta-margin) var(--site-space-inline-desktop);
     margin: 1.5em 0;
     font-family: var(--font-family-body);
@@ -192,8 +206,8 @@ body {
   }
 
   .prose li input[type="checkbox"]:checked {
-    background: var(--site-tag-sage);
-    border-color: var(--site-tag-sage);
+    background: var(--site-tag-olive);
+    border-color: var(--site-tag-olive);
   }
 
   .prose li input[type="checkbox"]:checked::after {
@@ -210,7 +224,7 @@ body {
   }
 
   .prose mark {
-    background: color-mix(in srgb, var(--site-tag-sage) 16%, white);
+    background: color-mix(in srgb, var(--site-tag-olive) 16%, white);
     color: var(--site-ink);
     padding: var(--spacing-2xs) var(--site-space-copy-offset);
     border-radius: 3px;
@@ -223,7 +237,7 @@ body {
 
   .prose sup {
     font-size: 0.75em;
-    color: var(--site-tag-sage);
+    color: var(--site-tag-olive);
     font-weight: var(--font-weight-medium);
   }
 

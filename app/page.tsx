@@ -4,6 +4,7 @@ import Divider from "./components/Divider";
 import MobileHeader from "./components/MobileHeader";
 import PinIcon from "./components/PinIcon";
 import { getAllNotes, getNoteDisplayTitle } from "./lib/notes";
+import { getNoteTagColorCssValue, getNoteTagLabel } from "./lib/noteTags";
 import styles from "./page.module.css";
 
 const projects = [
@@ -56,14 +57,6 @@ const backgroundEntries = {
     },
   ],
 };
-
-const noteTagClasses = [
-  styles.tagOlive,
-  styles.tagViolet,
-  styles.tagBlue,
-  styles.tagBrown,
-  styles.tagRose,
-];
 
 function TimelineConnector({ className }: { className?: string }) {
   return (
@@ -191,9 +184,10 @@ export default function HomePage() {
                           <span className={styles.tagMetaItem} key={`${note.slug}-${tag}`}>
                             <span
                               data-ruler-tag
-                              className={`${styles.noteTag} ${noteTagClasses[tagIndex % noteTagClasses.length]}`}
+                              className={styles.noteTag}
+                              style={{ color: getNoteTagColorCssValue(tag) }}
                             >
-                              {tag}
+                              {getNoteTagLabel(tag)}
                             </span>
                             {tagIndex < note.tags.length - 1 ? <span className={styles.dot}>•</span> : null}
                           </span>

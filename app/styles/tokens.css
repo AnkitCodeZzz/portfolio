@@ -190,9 +190,9 @@
   --site-motion-link-duration: 260ms;
   --site-motion-link-ease: cubic-bezier(0.16, 1, 0.3, 1);
   --site-motion-glitch-duration: 220ms;
-  --site-motion-tag-stagger: 220ms;
-  --site-motion-tag-duration: 4200ms;
-  --site-motion-tag-reveal-delay: 240ms;
-  --site-motion-tag-scramble-step: 120ms;
+  --site-motion-tag-stagger: 56ms;
+  --site-motion-tag-duration: 520ms;
+  --site-motion-tag-reveal-delay: 60ms;
+  --site-motion-tag-scramble-step: 44ms;
   --site-size-link-underline: 1px;
 }

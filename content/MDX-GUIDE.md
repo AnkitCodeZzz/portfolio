@@ -37,6 +37,20 @@ const x = 10;
 ## Image
 ![Alt text](/path/to/image.jpg)
 
+## Image grid
+```mdx
+<ImageGrid columns={2}>
+  <ImageCell>
+    ![Alt text](/path/to/image-a.jpg)
+  </ImageCell>
+  <ImageCell>
+    ![Alt text](/path/to/image-b.jpg)
+  </ImageCell>
+</ImageGrid>
+```
+
+`column={3}` also works if you prefer the singular prop name.
+
 ## Horizontal rule
 ---
 

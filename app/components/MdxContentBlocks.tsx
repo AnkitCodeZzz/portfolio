@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+import { Children, isValidElement, type ReactNode } from "react";
+import MdxAccordion from "./MdxAccordion";
+import MdxImageDialog from "./MdxImageDialog";
 
 type FactsProps = {
   children: ReactNode;
@@ -9,10 +11,18 @@ type FactProps = {
   children: ReactNode;
 };
 
-type AccordionProps = {
-  title: string;
+type ImageGridProps = {
   children: ReactNode;
-  defaultOpen?: boolean;
+  columns?: number | string;
+  column?: number | string;
+};
+
+type ImageCellProps = {
+  children: ReactNode;
+};
+
+type ParagraphProps = {
+  children: ReactNode;
 };
 
 export function Facts({ children }: FactsProps) {
@@ -28,45 +38,66 @@ export function Fact({ label, children }: FactProps) {
   );
 }
 
-export function Accordion({
-  title,
+export function Paragraph({ children }: ParagraphProps) {
+  const items = Children.toArray(children).filter((child) => {
+    if (typeof child === "string") {
+      return child.trim().length > 0;
+    }
+
+    return true;
+  });
+
+  const isStandaloneMediaBlock =
+    items.length === 1 &&
+    isValidElement(items[0]) &&
+    (items[0].type === MdxImageDialog || items[0].type === ImageGrid);
+
+  if (isStandaloneMediaBlock) {
+    return <>{children}</>;
+  }
+
+  return <p>{children}</p>;
+}
+
+export function ImageGrid({
   children,
-  defaultOpen = false,
-}: AccordionProps) {
+  columns,
+  column,
+}: ImageGridProps) {
+  const items = Children.toArray(children).filter((child) => {
+    if (typeof child === "string") {
+      return child.trim().length > 0;
+    }
+
+    return isValidElement(child);
+  });
+  const requestedColumns = columns ?? column ?? 2;
+  const parsedColumns =
+    typeof requestedColumns === "string"
+      ? Number.parseInt(requestedColumns, 10)
+      : requestedColumns;
+  const safeColumns =
+    Number.isFinite(parsedColumns) && parsedColumns > 0
+      ? Math.min(parsedColumns, 4)
+      : Math.min(Math.max(items.length, 1), 4);
+
   return (
-    <details className="mdx-accordion" open={defaultOpen}>
-      <summary className="mdx-accordionSummary">
-        <span className="mdx-accordionTitle">{title}</span>
-        <span className="mdx-accordionToggle" aria-hidden="true">
-          <svg
-            className="mdx-accordionToggleIcon"
-            viewBox="0 0 16 16"
-            fill="none"
-          >
-            <line
-              className="mdx-accordionToggleLine"
-              x1="2.5"
-              y1="8"
-              x2="13.5"
-              y2="8"
-            />
-            <line
-              className="mdx-accordionToggleLine mdx-accordionToggleLineVertical"
-              x1="8"
-              y1="2.5"
-              x2="8"
-              y2="13.5"
-            />
-          </svg>
-        </span>
-      </summary>
-      <div className="mdx-accordionPanel">{children}</div>
-    </details>
+    <div className={`mdx-imageGrid mdx-imageGridColumns${safeColumns}`}>
+      {items}
+    </div>
   );
 }
 
+export function ImageCell({ children }: ImageCellProps) {
+  return <div className="mdx-imageCell">{children}</div>;
+}
+
 export const sharedMdxComponents = {
+  p: Paragraph,
   Facts,
   Fact,
-  Accordion,
+  Accordion: MdxAccordion,
+  ImageGrid,
+  ImageCell,
+  img: MdxImageDialog,
 };

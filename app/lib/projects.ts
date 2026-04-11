@@ -145,15 +145,37 @@ function formatFieldList(fields: string[]) {
 function getMissingRequiredProjectFields(
   input: Pick<ProjectInput, "slug" | "title" | "date" | "type" | "category" | "color" | "description">
 ) {
+  const isCraftProject = input.type === "craft";
+
   return [
     !input.slug.trim() && "slug",
     !input.title.trim() && "title",
     !input.type.trim() && "type",
-    !input.category.trim() && "category",
+    !isCraftProject && !input.category.trim() && "category",
     !input.color.trim() && "color",
-    !input.description.trim() && "description",
-    !input.date.trim() && "date",
+    !isCraftProject && !input.description.trim() && "description",
+    !isCraftProject && !input.date.trim() && "date",
   ].filter(Boolean) as string[];
+}
+
+export function getProjectShowcaseImagePath(content: string) {
+  const match = content.match(/!\[[^\]]*\]\((\/[^)\s]+)\)/);
+
+  return match?.[1] ?? null;
+}
+
+export type ProjectShowcaseImage = {
+  src: string;
+  alt: string;
+};
+
+export function getProjectShowcaseImages(content: string): ProjectShowcaseImage[] {
+  const matches = content.matchAll(/!\[([^\]]*)\]\((\/[^)\s]+)(?:\s+"[^"]*")?\)/g);
+
+  return Array.from(matches, (match) => ({
+    alt: match[1]?.trim() ?? "",
+    src: match[2] ?? "",
+  })).filter((image) => image.src.length > 0);
 }
 
 export function getProjectDisplayTitle(project: Pick<ProjectMetadata, "slug" | "title">) {

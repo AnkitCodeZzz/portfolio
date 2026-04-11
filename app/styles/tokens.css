@@ -196,3 +196,9 @@
   --site-motion-tag-scramble-step: 44ms;
   --site-size-link-underline: 1px;
 }
+
+@media (min-width: 1280px) {
+  :root {
+    --site-content-max: calc(100vw - 640px);
+  }
+}

@@ -25,6 +25,10 @@ type ParagraphProps = {
   children: ReactNode;
 };
 
+type CarouselProps = {
+  children: ReactNode;
+};
+
 export function Facts({ children }: FactsProps) {
   return <dl className="mdx-facts">{children}</dl>;
 }
@@ -92,6 +96,26 @@ export function ImageCell({ children }: ImageCellProps) {
   return <div className="mdx-imageCell">{children}</div>;
 }
 
+export function Carousel({ children }: CarouselProps) {
+  const items = Children.toArray(children).filter((child) => {
+    if (typeof child === "string") {
+      return child.trim().length > 0;
+    }
+
+    return isValidElement(child);
+  });
+
+  return (
+    <div className="mdx-carousel">
+      {items.map((child, index) => (
+        <div key={index} className="mdx-carouselSlide">
+          {child}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export const sharedMdxComponents = {
   p: Paragraph,
   Facts,
@@ -99,5 +123,6 @@ export const sharedMdxComponents = {
   Accordion: MdxAccordion,
   ImageGrid,
   ImageCell,
+  Carousel,
   img: MdxImageDialog,
 };

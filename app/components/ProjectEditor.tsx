@@ -20,6 +20,7 @@ import type { Project } from "../lib/projects";
 
 type ProjectEditorProps = {
   project: Project;
+  fixedType?: Project["type"];
   mode?: "edit" | "create";
 };
 
@@ -171,14 +172,16 @@ function formatFieldList(fields: string[]) {
 }
 
 function getMissingRequiredFields(draft: DraftState) {
+  const isCraftProject = draft.type === "craft";
+
   return [
     !draft.slug.trim() && "slug",
     !draft.title.trim() && "title",
     !draft.type.trim() && "type",
-    !draft.category.trim() && "category",
+    !isCraftProject && !draft.category.trim() && "category",
     !draft.color.trim() && "color",
     !draft.description.trim() && "description",
-    !draft.date.trim() && "date",
+    !isCraftProject && !draft.date.trim() && "date",
   ].filter(Boolean) as string[];
 }
 
@@ -192,6 +195,7 @@ function getProjectSlugPlaceholder() {
 
 export default function ProjectEditor({
   project,
+  fixedType,
   mode = "edit",
 }: ProjectEditorProps) {
   const router = useRouter();
@@ -210,6 +214,8 @@ export default function ProjectEditor({
   const persistedSlug = savedDraft.slug;
   const activeSlug = persistedSlug || draft.slug;
   const activeSlugLabel = formatSlugLabel(activeSlug) || "new project";
+  const isCraftProject = draft.type === "craft";
+  const isTypeLocked = Boolean(fixedType);
   const missingRequiredFields = getMissingRequiredFields(draft);
   const canSave =
     saveState !== "saving" &&
@@ -474,7 +480,7 @@ export default function ProjectEditor({
         body: JSON.stringify({
           slug: draft.slug,
           title: draft.title,
-          type: draft.type,
+          type: fixedType ?? draft.type,
           category: draft.category,
           color: draft.color,
           description: draft.description,
@@ -728,72 +734,76 @@ export default function ProjectEditor({
                   </div>
                 </div>
 
-                <div className={`${styles.guidedField} ${styles.guidedFieldMuted}`}>
-                  <div className={styles.guidedLead}>
-                    <div className={styles.guidedLeadMeta}>
-                      <label className={styles.guidedLabel}>Type</label>
-                    </div>
-                    <div className={styles.guidedLine} aria-hidden="true">
-                      <DoubleArrowLine />
-                    </div>
-                  </div>
-                  <div className={styles.guidedFieldContent}>
-                    <div className={styles.tagChoiceGrid}>
-                      {PROJECT_TYPES.map((typeOption) => (
-                        <button
-                          key={typeOption.key}
-                          type="button"
-                          className={`${styles.tagChoiceChip} ${draft.type === typeOption.key ? styles.tagChoiceChipActive : ""}`}
-                          style={
-                            {
-                              "--tag-choice-color": getProjectColorCssValue(
-                                typeToneByKey[typeOption.key]
-                              ),
-                            } as CSSProperties
-                          }
-                          onClick={() => {
-                            updateDraft("type", typeOption.key);
-                          }}
-                        >
-                          {typeOption.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className={`${styles.guidedField} ${styles.guidedFieldMuted}`}>
-                  <div className={styles.guidedLead}>
-                    <div className={styles.guidedLeadMeta}>
-                      <div className={`${styles.metaFieldHeader} ${styles.metaFieldHeaderStacked}`}>
-                        <FieldHint
-                          label="About project category"
-                          text="This is the short label shown above the project title."
-                          tone="olive"
-                        />
-                        <label className={styles.guidedLabel} htmlFor="project-category">
-                          Category
-                        </label>
+                {!isTypeLocked ? (
+                  <div className={`${styles.guidedField} ${styles.guidedFieldMuted}`}>
+                    <div className={styles.guidedLead}>
+                      <div className={styles.guidedLeadMeta}>
+                        <label className={styles.guidedLabel}>Type</label>
+                      </div>
+                      <div className={styles.guidedLine} aria-hidden="true">
+                        <DoubleArrowLine />
                       </div>
                     </div>
-                    <div className={styles.guidedLine} aria-hidden="true">
-                      <DoubleArrowLine />
+                    <div className={styles.guidedFieldContent}>
+                      <div className={styles.tagChoiceGrid}>
+                        {PROJECT_TYPES.map((typeOption) => (
+                          <button
+                            key={typeOption.key}
+                            type="button"
+                            className={`${styles.tagChoiceChip} ${draft.type === typeOption.key ? styles.tagChoiceChipActive : ""}`}
+                            style={
+                              {
+                                "--tag-choice-color": getProjectColorCssValue(
+                                  typeToneByKey[typeOption.key]
+                                ),
+                              } as CSSProperties
+                            }
+                            onClick={() => {
+                              updateDraft("type", typeOption.key);
+                            }}
+                          >
+                            {typeOption.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                  <div className={styles.guidedFieldContent}>
-                    <AutoResizeTextarea
-                      id="project-category"
-                      className={`${styles.metaInput} ${styles.guidedMetaInput} ${styles.guidedProjectCategoryInput}`}
-                      rows={1}
-                      autoComplete="off"
-                      spellCheck
-                      value={draft.category}
-                      onChange={(event) => {
-                        updateDraft("category", event.target.value);
-                      }}
-                    />
+                ) : null}
+
+                {!isCraftProject ? (
+                  <div className={`${styles.guidedField} ${styles.guidedFieldMuted}`}>
+                    <div className={styles.guidedLead}>
+                      <div className={styles.guidedLeadMeta}>
+                        <div className={`${styles.metaFieldHeader} ${styles.metaFieldHeaderStacked}`}>
+                          <FieldHint
+                            label="About project category"
+                            text="This is the short label shown above the project title."
+                            tone="olive"
+                          />
+                          <label className={styles.guidedLabel} htmlFor="project-category">
+                            Category
+                          </label>
+                        </div>
+                      </div>
+                      <div className={styles.guidedLine} aria-hidden="true">
+                        <DoubleArrowLine />
+                      </div>
+                    </div>
+                    <div className={styles.guidedFieldContent}>
+                      <AutoResizeTextarea
+                        id="project-category"
+                        className={`${styles.metaInput} ${styles.guidedMetaInput} ${styles.guidedProjectCategoryInput}`}
+                        rows={1}
+                        autoComplete="off"
+                        spellCheck
+                        value={draft.category}
+                        onChange={(event) => {
+                          updateDraft("category", event.target.value);
+                        }}
+                      />
+                    </div>
                   </div>
-                </div>
+                ) : null}
 
                 <div className={`${styles.guidedField} ${styles.guidedFieldMuted}`}>
                   <div className={styles.guidedLead}>
@@ -853,69 +863,73 @@ export default function ProjectEditor({
                   </div>
                 </div>
 
-                <div className={`${styles.guidedField} ${styles.guidedFieldMuted} ${styles.guidedFieldPin}`}>
-                  <div className={styles.guidedLead}>
-                    <div className={styles.guidedLeadMeta}>
-                      <label className={styles.guidedLabel}>Pin</label>
+                {!isCraftProject ? (
+                  <div className={`${styles.guidedField} ${styles.guidedFieldMuted} ${styles.guidedFieldPin}`}>
+                    <div className={styles.guidedLead}>
+                      <div className={styles.guidedLeadMeta}>
+                        <label className={styles.guidedLabel}>Pin</label>
+                      </div>
+                      <div className={styles.guidedLine} aria-hidden="true">
+                        <DoubleArrowLine />
+                      </div>
                     </div>
-                    <div className={styles.guidedLine} aria-hidden="true">
-                      <DoubleArrowLine />
+                    <div className={styles.guidedFieldContent}>
+                      <div className={styles.pinChoiceRow}>
+                        <button
+                          type="button"
+                          className={`${styles.pinChoiceButton} ${styles.pinChoiceYes} ${draft.pinned ? styles.pinChoiceActiveYes : ""}`}
+                          onClick={() => {
+                            updateDraft("pinned", true);
+                          }}
+                          aria-pressed={draft.pinned}
+                        >
+                          Yes
+                        </button>
+                        <span className={styles.pinChoiceDivider} aria-hidden="true">
+                          /
+                        </span>
+                        <button
+                          type="button"
+                          className={`${styles.pinChoiceButton} ${styles.pinChoiceNo} ${!draft.pinned ? styles.pinChoiceActiveNo : ""}`}
+                          onClick={() => {
+                            updateDraft("pinned", false);
+                          }}
+                          aria-pressed={!draft.pinned}
+                        >
+                          No
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <div className={styles.guidedFieldContent}>
-                    <div className={styles.pinChoiceRow}>
-                      <button
-                        type="button"
-                        className={`${styles.pinChoiceButton} ${styles.pinChoiceYes} ${draft.pinned ? styles.pinChoiceActiveYes : ""}`}
-                        onClick={() => {
-                          updateDraft("pinned", true);
-                        }}
-                        aria-pressed={draft.pinned}
-                      >
-                        Yes
-                      </button>
-                      <span className={styles.pinChoiceDivider} aria-hidden="true">
-                        /
-                      </span>
-                      <button
-                        type="button"
-                        className={`${styles.pinChoiceButton} ${styles.pinChoiceNo} ${!draft.pinned ? styles.pinChoiceActiveNo : ""}`}
-                        onClick={() => {
-                          updateDraft("pinned", false);
-                        }}
-                        aria-pressed={!draft.pinned}
-                      >
-                        No
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                ) : null}
 
-                <div className={`${styles.guidedField} ${styles.guidedFieldMuted}`}>
-                  <div className={styles.guidedLead}>
-                    <div className={styles.guidedLeadMeta}>
-                      <label className={styles.guidedLabel} htmlFor="project-date">
-                        Date
-                      </label>
+                {!isCraftProject ? (
+                  <div className={`${styles.guidedField} ${styles.guidedFieldMuted}`}>
+                    <div className={styles.guidedLead}>
+                      <div className={styles.guidedLeadMeta}>
+                        <label className={styles.guidedLabel} htmlFor="project-date">
+                          Date
+                        </label>
+                      </div>
+                      <div className={styles.guidedLine} aria-hidden="true">
+                        <DoubleArrowLine />
+                      </div>
                     </div>
-                    <div className={styles.guidedLine} aria-hidden="true">
-                      <DoubleArrowLine />
+                    <div className={styles.guidedFieldContent}>
+                      <AutoResizeTextarea
+                        id="project-date"
+                        className={`${styles.metaInput} ${styles.guidedMetaInput} ${styles.guidedDateInput}`}
+                        rows={1}
+                        autoComplete="off"
+                        spellCheck={false}
+                        value={draft.date}
+                        onChange={(event) => {
+                          updateDraft("date", event.target.value);
+                        }}
+                      />
                     </div>
                   </div>
-                  <div className={styles.guidedFieldContent}>
-                    <AutoResizeTextarea
-                      id="project-date"
-                      className={`${styles.metaInput} ${styles.guidedMetaInput} ${styles.guidedDateInput}`}
-                      rows={1}
-                      autoComplete="off"
-                      spellCheck={false}
-                      value={draft.date}
-                      onChange={(event) => {
-                        updateDraft("date", event.target.value);
-                      }}
-                    />
-                  </div>
-                </div>
+                ) : null}
               </div>
             </div>
 
@@ -925,7 +939,7 @@ export default function ProjectEditor({
               <div className={styles.bodyField}>
                 <div className={styles.bodyHeader}>
                   <label className={styles.fieldLabel} htmlFor="project-content">
-                    Body
+                    {isCraftProject ? "Showcase" : "Body"}
                   </label>
                   <div className={styles.bodyTools}>
                     <EditorImageUploadButton
@@ -934,7 +948,12 @@ export default function ProjectEditor({
                       missingIdentifierMessage="Add a slug before uploading an image."
                       className={`${styles.bodyToolButton} ${styles.bodyToolDesktopOnly}`}
                       onUploaded={(upload) => {
-                        insertBodyMarkdown(upload.markdown);
+                        const markdown =
+                          isCraftProject && !draft.content.trim()
+                            ? `<Carousel>\n${upload.markdown}\n</Carousel>`
+                            : upload.markdown;
+
+                        insertBodyMarkdown(markdown);
                         showToast(
                           {
                             tone: "saved",
@@ -955,11 +974,40 @@ export default function ProjectEditor({
                         );
                       }}
                     />
-                    <span
-                      className={`${styles.bodyToolDivider} ${styles.bodyToolDesktopOnly}`}
-                      aria-hidden="true"
-                    />
-                    <MdxGuidePopover />
+                    {isCraftProject ? (
+                      <>
+                        <span
+                          className={`${styles.bodyToolDivider} ${styles.bodyToolDesktopOnly}`}
+                          aria-hidden="true"
+                        />
+                        <button
+                          type="button"
+                          className={styles.bodyToolButton}
+                          onClick={() => {
+                            insertBodyMarkdown(
+                              "<Carousel>\n![Alt text](/work/your-project/image.jpg)\n![Alt text](/work/your-project/image-2.jpg)\n</Carousel>"
+                            );
+                          }}
+                        >
+                          Insert carousel
+                        </button>
+                        <span
+                          className={styles.bodyToolDivider}
+                          aria-hidden="true"
+                        />
+                        <span className={styles.bodyMeta}>
+                          Image-first body
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span
+                          className={`${styles.bodyToolDivider} ${styles.bodyToolDesktopOnly}`}
+                          aria-hidden="true"
+                        />
+                        <MdxGuidePopover />
+                      </>
+                    )}
                     <span
                       className={styles.bodyToolDivider}
                       aria-hidden="true"
@@ -988,6 +1036,11 @@ export default function ProjectEditor({
                     }}
                     onKeyUp={rememberBodySelection}
                     onSelect={rememberBodySelection}
+                    placeholder={
+                      isCraftProject
+                        ? "<Carousel>\n![Alt text](/work/your-project/image.jpg)\n![Alt text](/work/your-project/image-2.jpg)\n</Carousel>"
+                        : undefined
+                    }
                   />
                 </div>
               </div>

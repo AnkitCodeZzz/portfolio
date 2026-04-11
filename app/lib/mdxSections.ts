@@ -10,6 +10,15 @@ import { unified } from "unified";
 export type MdxSection = {
   key: string;
   source: string;
+  title: string;
+  anchorId: string;
+};
+
+type HeadingLikeNode = {
+  type?: string;
+  value?: string;
+  alt?: string;
+  children?: HeadingLikeNode[];
 };
 
 function normalizeMdxBooleanProps(source: string) {
@@ -38,6 +47,67 @@ function serializeSectionFromSource(source: string, children: RootContent[]) {
   }
 
   return source.slice(start, end).trim();
+}
+
+function extractTextContent(node: HeadingLikeNode | undefined): string {
+  if (!node) {
+    return "";
+  }
+
+  if (
+    node.type === "text" ||
+    node.type === "inlineCode" ||
+    node.type === "code" ||
+    node.type === "html"
+  ) {
+    return typeof node.value === "string" ? node.value : "";
+  }
+
+  if (node.type === "image") {
+    return typeof node.alt === "string" ? node.alt : "";
+  }
+
+  if (!Array.isArray(node.children) || node.children.length === 0) {
+    return "";
+  }
+
+  return node.children.map((child) => extractTextContent(child)).join("");
+}
+
+function normalizeSectionTitle(value: string) {
+  return value.replace(/\s+/g, " ").trim();
+}
+
+function slugifySectionTitle(value: string) {
+  const slug = value
+    .toLowerCase()
+    .replace(/['"]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return slug || "section";
+}
+
+function resolveSectionTitle(children: RootContent[], index: number) {
+  const heading = children.find(
+    (node) => node.type === "heading" && node.depth === 2
+  );
+
+  if (heading) {
+    const headingText = normalizeSectionTitle(
+      extractTextContent(heading as HeadingLikeNode)
+    );
+
+    if (headingText) {
+      return headingText;
+    }
+  }
+
+  if (index === 0) {
+    return "Overview";
+  }
+
+  return `Section ${index + 1}`;
 }
 
 export function splitMdxIntoSections(source: string): MdxSection[] {
@@ -72,12 +142,33 @@ export function splitMdxIntoSections(source: string): MdxSection[] {
 
   if (groups.length === 0) {
     return normalizedSource.trim().length > 0
-      ? [{ key: "section-0", source: normalizedSource.trim() }]
+      ? [
+          {
+            key: "section-0",
+            source: normalizedSource.trim(),
+            title: "Overview",
+            anchorId: "overview",
+          },
+        ]
       : [];
   }
 
-  return groups.map((children, index) => ({
-    key: `section-${index}`,
-    source: serializeSectionFromSource(normalizedSource, children),
-  }));
+  const anchorCounts = new Map<string, number>();
+
+  return groups.map((children, index) => {
+    const title = resolveSectionTitle(children, index);
+    const anchorBase = slugifySectionTitle(title);
+    const anchorCount = anchorCounts.get(anchorBase) ?? 0;
+    const anchorId =
+      anchorCount === 0 ? anchorBase : `${anchorBase}-${anchorCount + 1}`;
+
+    anchorCounts.set(anchorBase, anchorCount + 1);
+
+    return {
+      key: `section-${index}`,
+      source: serializeSectionFromSource(normalizedSource, children),
+      title,
+      anchorId,
+    };
+  });
 }

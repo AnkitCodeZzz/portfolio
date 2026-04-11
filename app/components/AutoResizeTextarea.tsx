@@ -4,6 +4,7 @@ import {
   forwardRef,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useRef,
 } from "react";
 import type { TextareaHTMLAttributes } from "react";
@@ -33,6 +34,28 @@ const AutoResizeTextarea = forwardRef<HTMLTextAreaElement, AutoResizeTextareaPro
     useEffect(() => {
       resizeTextarea(textareaRef.current);
     }, [value]);
+
+    useLayoutEffect(() => {
+      const textarea = textareaRef.current;
+
+      if (!textarea || typeof ResizeObserver === "undefined") {
+        return;
+      }
+
+      const observer = new ResizeObserver(() => {
+        resizeTextarea(textarea);
+      });
+
+      observer.observe(textarea);
+
+      if (textarea.parentElement) {
+        observer.observe(textarea.parentElement);
+      }
+
+      return () => {
+        observer.disconnect();
+      };
+    }, []);
 
     return (
       <textarea

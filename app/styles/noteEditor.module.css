@@ -249,6 +249,14 @@
   gap: 24px;
 }
 
+.editorInlineMessage {
+  margin: 0;
+  font-family: var(--font-family-mono);
+  font-size: var(--site-size-meta);
+  line-height: 1.45;
+  color: var(--site-tag-rose);
+}
+
 .guidedField {
   --editor-guide-meta-width: 16px;
   --editor-guide-line-width: 12px;
@@ -915,8 +923,10 @@
 }
 
 .bodyInput {
+  display: block;
   min-height: 62vh;
   padding: 0;
+  overflow: hidden;
   font-family: var(--font-family-body);
   font-size: var(--site-size-body);
   line-height: var(--site-line-body);

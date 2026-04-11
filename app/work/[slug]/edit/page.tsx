@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import NoteScrollRestorer from "../../../components/NoteScrollRestorer";
 import PageFrame from "../../../components/PageFrame";
 import ProjectEditor from "../../../components/ProjectEditor";
@@ -22,10 +22,14 @@ export default async function EditProjectPage({
     notFound();
   }
 
+  if (project.type === "craft") {
+    redirect("/work#craft-showcase");
+  }
+
   return (
     <PageFrame>
       <NoteScrollRestorer storageKey={`work-scroll:${project.slug}`} />
-      <ProjectEditor project={project} />
+      <ProjectEditor project={project} fixedType="case-study" />
     </PageFrame>
   );
 }

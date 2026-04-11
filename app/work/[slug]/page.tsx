@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import Breadcrumbs from "../../components/Breadcrumbs";
@@ -9,6 +9,7 @@ import { sharedMdxComponents } from "../../components/MdxContentBlocks";
 import NoteScrollRestorer from "../../components/NoteScrollRestorer";
 import PageFrame from "../../components/PageFrame";
 import PinIcon from "../../components/PinIcon";
+import ScrollSectionNav from "../../components/ScrollSectionNav";
 import { splitMdxIntoSections } from "../../lib/mdxSections";
 import { getProjectColorCssValue } from "../../lib/projectMeta";
 import {
@@ -36,6 +37,10 @@ export default async function WorkProjectPage({
 
   if (!project) {
     notFound();
+  }
+
+  if (project.type === "craft") {
+    redirect("/work#craft-showcase");
   }
 
   const editingEnabled = process.env.NODE_ENV === "development";
@@ -99,26 +104,35 @@ export default async function WorkProjectPage({
       </section>
 
       <div className={editorial.readingSections}>
-        {contentSections.length > 0 ? (
-          <Divider className={editorial.detailContentDivider} />
-        ) : null}
-        {contentSections.map((section) => (
-          <section
-            key={section.key}
-            className={`${editorial.contentSection} ${editorial.readingSection}`}
-            data-ruler-track
-          >
-            <div className={editorial.proseWrap}>
-              <div className="prose">
-                <MDXRemote
-                  source={section.source}
-                  components={sharedMdxComponents}
-                  options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
-                />
-              </div>
-            </div>
-          </section>
-        ))}
+        {contentSections.length > 0 ? <Divider className={editorial.detailContentDivider} /> : null}
+        <div className={editorial.readingLayout}>
+          <ScrollSectionNav
+            items={contentSections.map((section) => ({
+              anchorId: section.anchorId,
+              title: section.title,
+            }))}
+          />
+          <div className={editorial.readingContent}>
+            {contentSections.map((section) => (
+              <section
+                key={section.key}
+                id={section.anchorId}
+                className={`${editorial.contentSection} ${editorial.readingSection}`}
+                data-ruler-track
+              >
+                <div className={editorial.proseWrap}>
+                  <div className="prose">
+                    <MDXRemote
+                      source={section.source}
+                      components={sharedMdxComponents}
+                      options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+                    />
+                  </div>
+                </div>
+              </section>
+            ))}
+          </div>
+        </div>
       </div>
     </PageFrame>
   );

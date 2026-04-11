@@ -188,6 +188,43 @@ export function getProjectDisplayTitle(project: Pick<ProjectMetadata, "slug" | "
   return project.slug.replace(/[-_]+/g, " ").trim() || "untitled project";
 }
 
+function getProjectLocalUploadPaths(content: string) {
+  return getProjectShowcaseImages(content)
+    .map((image) => image.src)
+    .filter((src) => src.startsWith("/work/"));
+}
+
+function getPublicFilePathFromProjectAsset(src: string) {
+  const relativePath = src.replace(/^\/+/, "");
+  const filePath = path.normalize(path.join(process.cwd(), "public", relativePath));
+  const publicDir = path.join(process.cwd(), "public");
+
+  if (!filePath.startsWith(publicDir)) {
+    return null;
+  }
+
+  return filePath;
+}
+
+function isProjectAssetReferencedElsewhere(assetPath: string, excludingSlug: string) {
+  ensureProjectsDir();
+
+  const files = fs.readdirSync(projectsDir).filter((file) => file.endsWith(".mdx"));
+
+  return files.some((file) => {
+    const slug = file.replace(/\.mdx$/, "");
+
+    if (slug === excludingSlug) {
+      return false;
+    }
+
+    const raw = fs.readFileSync(path.join(projectsDir, file), "utf8");
+    const { content } = matter(raw);
+
+    return getProjectLocalUploadPaths(content).includes(assetPath);
+  });
+}
+
 export function getAvailableProjectSlug(baseSlug = "untitled-project") {
   const sanitizedBaseSlug =
     baseSlug
@@ -401,9 +438,26 @@ export function createProject(input: ProjectInput): Project {
 
 export function deleteProject(slug: string) {
   const filePath = getProjectFilePath(slug);
+  const project = getProject(slug);
 
   if (!filePath || !fs.existsSync(filePath)) {
     return false;
+  }
+
+  if (project?.type === "craft") {
+    const assetPaths = getProjectLocalUploadPaths(project.content);
+
+    for (const assetPath of assetPaths) {
+      if (isProjectAssetReferencedElsewhere(assetPath, slug)) {
+        continue;
+      }
+
+      const publicFilePath = getPublicFilePathFromProjectAsset(assetPath);
+
+      if (publicFilePath && fs.existsSync(publicFilePath)) {
+        fs.unlinkSync(publicFilePath);
+      }
+    }
   }
 
   fs.unlinkSync(filePath);

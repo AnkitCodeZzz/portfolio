@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Image from "next/image";
 import DeleteProjectButton from "./DeleteProjectButton";
 import editorial from "../styles/editorial.module.css";
@@ -16,6 +16,115 @@ type CraftShowcaseProps = {
   editingEnabled?: boolean;
   items: CraftShowcaseItem[];
 };
+
+type CraftShowcaseThumbnailProps = {
+  item: CraftShowcaseItem;
+  index: number;
+  onOpen: (index: number) => void;
+};
+
+function CraftShowcaseThumbnail({
+  item,
+  index,
+  onOpen,
+}: CraftShowcaseThumbnailProps) {
+  const [inlineScale, setInlineScale] = useState(1.08);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const currentScaleRef = useRef(1.08);
+  const targetScaleRef = useRef(1.08);
+
+  useEffect(() => {
+    const element = buttonRef.current;
+    if (!element) {
+      return;
+    }
+
+    const startScale = 1.08;
+    const endScale = 1;
+    let frameId = 0;
+
+    function updateTargetScale() {
+      const currentElement = buttonRef.current;
+      if (!currentElement) {
+        return;
+      }
+
+      const rect = currentElement.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || 1;
+      const shrinkStart = viewportHeight * 0.92;
+      const shrinkEnd = viewportHeight * 0.2;
+      const progress = (shrinkStart - rect.top) / (shrinkStart - shrinkEnd);
+      const clamped = Math.min(Math.max(progress, 0), 1);
+      targetScaleRef.current = startScale - clamped * (startScale - endScale);
+    }
+
+    function animateScale() {
+      const current = currentScaleRef.current;
+      const target = targetScaleRef.current;
+      const next = current + (target - current) * 0.16;
+
+      if (Math.abs(next - target) < 0.0005) {
+        currentScaleRef.current = target;
+        setInlineScale(target);
+        frameId = 0;
+        return;
+      }
+
+      currentScaleRef.current = next;
+      setInlineScale(Number(next.toFixed(4)));
+      frameId = window.requestAnimationFrame(animateScale);
+    }
+
+    function queueUpdate() {
+      updateTargetScale();
+
+      if (!frameId) {
+        frameId = window.requestAnimationFrame(animateScale);
+      }
+    }
+
+    queueUpdate();
+    window.addEventListener("scroll", queueUpdate, { passive: true });
+    window.addEventListener("resize", queueUpdate);
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      window.removeEventListener("scroll", queueUpdate);
+      window.removeEventListener("resize", queueUpdate);
+    };
+  }, []);
+
+  const inlineStyle = {
+    "--media-inline-scale": inlineScale,
+  } as CSSProperties;
+
+  return (
+    <button
+      ref={buttonRef}
+      type="button"
+      className={`${editorial.utilityMediaButton} ${homeStyles.showcaseCard}`}
+      style={inlineStyle}
+      onClick={() => {
+        onOpen(index);
+      }}
+      aria-label="Open craft showcase image"
+    >
+      <span className={`${editorial.utilityMediaFrame} ${homeStyles.showcaseFrame}`}>
+        <span
+          className={`${editorial.utilityMediaInlineStage} ${homeStyles.showcaseStage}`}
+        >
+          <Image
+            src={item.imageSrc}
+            alt={item.alt}
+            fill
+            sizes="(min-width: 1280px) 520px, (min-width: 900px) 45vw, 100vw"
+            className={homeStyles.showcaseImage}
+          />
+        </span>
+      </span>
+    </button>
+  );
+}
 
 export default function CraftShowcase({
   items,
@@ -90,29 +199,12 @@ export default function CraftShowcase({
     <>
       <div className={homeStyles.showcaseGrid}>
         {items.map((item, index) => (
-          <button
+          <CraftShowcaseThumbnail
             key={`${item.slug}-${index}`}
-            type="button"
-            className={`${editorial.utilityMediaButton} ${homeStyles.showcaseCard}`}
-            onClick={() => {
-              openItem(index);
-            }}
-            aria-label="Open craft showcase image"
-          >
-            <span className={`${editorial.utilityMediaFrame} ${homeStyles.showcaseFrame}`}>
-              <span
-                className={`${editorial.utilityMediaInlineStage} ${homeStyles.showcaseStage}`}
-              >
-                <Image
-                  src={item.imageSrc}
-                  alt={item.alt}
-                  fill
-                  sizes="(min-width: 1280px) 520px, (min-width: 900px) 45vw, 100vw"
-                  className={homeStyles.showcaseImage}
-                />
-              </span>
-            </span>
-          </button>
+            item={item}
+            index={index}
+            onOpen={openItem}
+          />
         ))}
       </div>
 

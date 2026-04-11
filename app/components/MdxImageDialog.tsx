@@ -19,10 +19,10 @@ export default function MdxImageDialog({
   ...props
 }: MdxImageDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [inlineScale, setInlineScale] = useState(1.16);
+  const [inlineScale, setInlineScale] = useState(1.08);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
-  const currentScaleRef = useRef(1.16);
-  const targetScaleRef = useRef(1.16);
+  const currentScaleRef = useRef(1.08);
+  const targetScaleRef = useRef(1.08);
   const stripePatternId = useId();
   const stripeClipId = useId();
 
@@ -53,7 +53,7 @@ export default function MdxImageDialog({
       return;
     }
 
-    const startScale = 1.16;
+    const startScale = 1.08;
     const endScale = 1;
     let frameId = 0;
 

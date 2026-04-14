@@ -924,9 +924,9 @@ a.heroNow {
   max-width: var(--site-content-max);
   margin: 0 auto;
   padding-top: var(--site-space-footer-y);
-  padding-right: var(--site-space-inline-page);
+  padding-right: 24px;
   padding-bottom: var(--site-space-footer-y);
-  padding-left: var(--site-space-header-offset);
+  padding-left: 24px;
 }
 
 .footerCopy {

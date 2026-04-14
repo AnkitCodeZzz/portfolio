@@ -20,8 +20,8 @@
 
 .brandRow,
 .mobileNavRow {
-  padding-right: 24px;
-  padding-left: 24px;
+  padding-right: var(--site-space-inline-page);
+  padding-left: var(--site-space-header-offset);
 }
 
 .mobileHeader {

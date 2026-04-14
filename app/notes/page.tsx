@@ -13,7 +13,11 @@ export default function NotesPage() {
 
   return (
     <PageFrame>
-      <section className={homeStyles.hero} data-ruler-track>
+      <section
+        className={homeStyles.hero}
+        data-ruler-track
+        data-ruler-pad-bottom={220}
+      >
         <div className={editorial.introBlock}>
           <div className={editorial.introCopy}>
             <div className={`${editorial.detailTopBar} ${editorial.introTopBar}`}>

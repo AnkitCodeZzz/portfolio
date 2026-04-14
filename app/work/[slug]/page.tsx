@@ -50,7 +50,11 @@ export default async function WorkProjectPage({
   return (
     <PageFrame className={editorial.detailPage}>
       <NoteScrollRestorer storageKey={`work-scroll:${project.slug}`} />
-      <section className={editorial.detailHeader} data-ruler-track>
+      <section
+        className={editorial.detailHeader}
+        data-ruler-track
+        data-ruler-pad-bottom={220}
+      >
         <div className={editorial.detailBlock}>
           <div className={editorial.detailLead}>
             <div className={editorial.detailTopBar}>

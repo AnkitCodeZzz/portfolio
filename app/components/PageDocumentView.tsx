@@ -26,7 +26,11 @@ export default function PageDocumentView({ page }: PageDocumentViewProps) {
 
   return (
     <PageFrame className={editorial.detailPage}>
-      <section className={editorial.detailHeader} data-ruler-track>
+      <section
+        className={editorial.detailHeader}
+        data-ruler-track
+        data-ruler-pad-bottom={220}
+      >
         <div className={editorial.introBlock}>
           <div className={editorial.introCopy}>
             <div className={`${editorial.detailTopBar} ${editorial.introTopBar}`}>

@@ -81,8 +81,6 @@ export default function Footer() {
           >
             LinkedIn
           </a>
-          <span className={styles.footerMutedDot}>•</span>
-          <span>Resume</span>
         </div>
       </div>
     </footer>

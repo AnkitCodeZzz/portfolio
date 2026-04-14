@@ -20,8 +20,8 @@
 
 .brandRow,
 .mobileNavRow {
-  padding-right: var(--site-space-inline-page);
-  padding-left: var(--site-space-header-offset);
+  padding-right: 24px;
+  padding-left: 24px;
 }
 
 .mobileHeader {
@@ -103,8 +103,8 @@
 }
 
 .mobileNavRow {
-  padding-right: var(--site-space-inline-page);
-  padding-left: var(--site-space-header-offset);
+  padding-right: 24px;
+  padding-left: 24px;
 }
 
 .mobileNavRuler {
@@ -692,6 +692,16 @@ a.heroNow {
     text-underline-offset var(--site-motion-link-duration) var(--site-motion-link-ease);
 }
 
+.backgroundPlace {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: var(--site-line-decoration-offset);
+  transition:
+    color var(--site-motion-link-duration) var(--site-motion-link-ease),
+    text-decoration-color var(--site-motion-link-duration) var(--site-motion-link-ease),
+    text-underline-offset var(--site-motion-link-duration) var(--site-motion-link-ease);
+}
+
 .noteTitleLink {
   display: inline-flex;
   color: inherit;
@@ -1172,7 +1182,9 @@ a.heroNow {
   .noteTitleLink:hover .noteTitle,
   .noteTitleLink:focus-visible .noteTitle,
   .noteTitleLink:hover .projectTitle,
-  .noteTitleLink:focus-visible .projectTitle {
+  .noteTitleLink:focus-visible .projectTitle,
+  .noteTitleLink:hover .backgroundPlace,
+  .noteTitleLink:focus-visible .backgroundPlace {
     color: var(--site-link-primary);
     text-decoration-color: var(--site-link-primary);
   }

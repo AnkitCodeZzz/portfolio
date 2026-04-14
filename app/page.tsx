@@ -17,6 +17,7 @@ const backgroundEntries = {
     role: "B. Design [UX]",
     date: "Jun 2022 - Present",
     place: "Chitkara University",
+    href: "https://www.chitkara.edu.in/design/",
     description: "Building a strong foundation in design, learning from some of the most influential voices in the industry and my peers.",
   },
   rest: [
@@ -24,18 +25,21 @@ const backgroundEntries = {
       role: "Internship",
       date: "May - Jul 2025",
       place: "Accenture SONG",
+      href: "https://www.accenture.com/us-en/about/accenture-song-index",
       description: "Worked in a 5-member team, translating research into user-centric, business-aligned solutions.",
     },
     {
       role: "Cohort",
       date: "Jul - Oct 2024",
       place: "Era of No-Code",
+      href: "https://www.linkedin.com/company/eraofnocode/",
       description: "Dived into no-code tools to build MVPs, simplify and speed up workflows.",
     },
     {
       role: "Cohort",
       date: "Jan - May 2024",
       place: "10K Designers",
+      href: "https://www.10kdesigners.com/u/ankit-mandal",
       description: "Connected with product designers, learning from their experiences.",
     },
   ],
@@ -239,7 +243,14 @@ export default function HomePage() {
                     <span className={styles.backgroundDate}>{backgroundEntries.lead.date}</span>
                   </div>
                   <div>
-                    <h3 className={styles.backgroundPlace}>{backgroundEntries.lead.place}</h3>
+                    <Link
+                      href={backgroundEntries.lead.href}
+                      className={styles.noteTitleLink}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <h3 className={styles.backgroundPlace}>{backgroundEntries.lead.place}</h3>
+                    </Link>
                     <p className={styles.backgroundDescription}>{backgroundEntries.lead.description}</p>
                   </div>
                 </article>
@@ -256,7 +267,14 @@ export default function HomePage() {
                           <span className={styles.backgroundDate}>{entry.date}</span>
                         </div>
                         <div>
-                          <h3 className={styles.backgroundPlace}>{entry.place}</h3>
+                          <Link
+                            href={entry.href}
+                            className={styles.noteTitleLink}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <h3 className={styles.backgroundPlace}>{entry.place}</h3>
+                          </Link>
                           <p className={styles.backgroundDescription}>{entry.description}</p>
                         </div>
                       </article>

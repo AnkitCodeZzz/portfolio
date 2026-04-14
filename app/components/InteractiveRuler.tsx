@@ -33,7 +33,8 @@ type TagLayers = {
   original: string;
 };
 
-const MOBILE_SECTION_ANCHOR_RATIO = 0.26;
+const MOBILE_SECTION_ANCHOR_RATIO = 0.65;
+const MOBILE_SECTION_TOP_SNAP_PX = 48;
 const TAG_SCRAMBLE_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 function clamp(value: number, min: number, max: number) {
@@ -509,13 +510,27 @@ export default function InteractiveRuler() {
         : sectionBounds[0];
 
       if (!isAtSectionEnd) {
-        for (const section of sectionBounds) {
-          if (section.activationTop <= anchorY) {
-            nextSection = section;
-            continue;
-          }
+        const topSnappedSection = sectionBounds.find((section) => {
+          const distanceFromViewportTop = section.rect.top - viewportTop;
 
-          break;
+          return (
+            distanceFromViewportTop >= 0 &&
+            distanceFromViewportTop <= MOBILE_SECTION_TOP_SNAP_PX &&
+            section.rect.bottom > viewportTop + MOBILE_SECTION_TOP_SNAP_PX
+          );
+        });
+
+        if (topSnappedSection) {
+          nextSection = topSnappedSection;
+        } else {
+          for (const section of sectionBounds) {
+            if (section.activationTop <= anchorY) {
+              nextSection = section;
+              continue;
+            }
+
+            break;
+          }
         }
       }
 

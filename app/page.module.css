@@ -264,7 +264,11 @@ a.heroNow {
   pointer-events: none;
   background: var(--site-highlight-fill);
   border-right: 1px solid var(--site-highlight-stroke);
-  transition: top 160ms ease, height 160ms ease, opacity 120ms ease;
+  transition:
+    top 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 140ms ease;
+  will-change: top, height;
 }
 
 .sidebarHighlight[data-visible="true"] {

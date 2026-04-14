@@ -570,6 +570,10 @@
   flex-direction: column;
 }
 
+.readingSectionsFlush {
+  padding-bottom: 0 !important;
+}
+
 .readingLayout {
   display: block;
   position: relative;

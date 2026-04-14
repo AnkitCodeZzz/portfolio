@@ -23,13 +23,14 @@ export default function PageDocumentView({ page }: PageDocumentViewProps) {
   const contentSections = splitMdxIntoSections(page.content);
   const editingEnabled = process.env.NODE_ENV === "development";
   const route = `/${page.key}`;
+  const isReadmePage = page.key === "readme";
 
   return (
     <PageFrame className={editorial.detailPage}>
       <section
         className={editorial.detailHeader}
         data-ruler-track
-        data-ruler-pad-bottom={220}
+        data-ruler-pad-bottom={320}
       >
         <div className={editorial.introBlock}>
           <div className={editorial.introCopy}>
@@ -55,7 +56,9 @@ export default function PageDocumentView({ page }: PageDocumentViewProps) {
         </div>
       </section>
 
-      <div className={editorial.readingSections}>
+      <div
+        className={`${editorial.readingSections} ${isReadmePage ? editorial.readingSectionsFlush : ""}`.trim()}
+      >
         {contentSections.length > 0 ? (
           <Divider className={editorial.detailContentDivider} />
         ) : null}

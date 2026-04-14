@@ -187,8 +187,8 @@
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 
   /* ==================== MOTION ==================== */
-  --site-motion-link-duration: 260ms;
-  --site-motion-link-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --site-motion-link-duration: 420ms;
+  --site-motion-link-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --site-motion-glitch-duration: 220ms;
   --site-motion-tag-stagger: 56ms;
   --site-motion-tag-duration: 520ms;

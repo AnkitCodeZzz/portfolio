@@ -171,6 +171,7 @@
 .brandMuted,
 .inactiveLink,
 .sectionAction,
+.projectTitle,
 .noteTitle,
 .footerLink {
   transition:
@@ -419,7 +420,7 @@ a.heroNow {
 .showcaseGrid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 20px;
+  gap: 24px;
 }
 
 .showcaseCard {
@@ -430,6 +431,10 @@ a.heroNow {
   --media-inline-scale: 1;
   --media-corner-radius: 16px;
   --media-frame-aspect: 16 / 10;
+}
+
+.showcaseGrid > .showcaseCard {
+  margin: 0;
 }
 
 .showcaseFrame {
@@ -469,7 +474,7 @@ a.heroNow {
   width: min(100%, 1160px);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 24px;
 }
 
 .showcaseLightboxTopBar {
@@ -681,6 +686,10 @@ a.heroNow {
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: var(--site-line-decoration-offset);
+  transition:
+    color var(--site-motion-link-duration) var(--site-motion-link-ease),
+    text-decoration-color var(--site-motion-link-duration) var(--site-motion-link-ease),
+    text-underline-offset var(--site-motion-link-duration) var(--site-motion-link-ease);
 }
 
 .noteTitleLink {
@@ -1070,7 +1079,7 @@ a.heroNow {
 
   .showcaseGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
+    gap: 24px;
   }
 
   .showcaseCard:nth-child(3n) {
@@ -1106,7 +1115,7 @@ a.heroNow {
 
 @media (max-width: 899px) {
   .showcaseLightbox {
-    padding: 16px;
+    padding: 16px 24px 24px;
   }
 
   .showcaseLightboxMedia {

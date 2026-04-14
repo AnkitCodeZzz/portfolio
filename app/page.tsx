@@ -75,7 +75,9 @@ function TimelineConnector({ className }: { className?: string }) {
 
 export default function HomePage() {
   const notes = getAllNotes().slice(0, 5);
-  const projects = getAllProjects().slice(0, 3);
+  const projects = getAllProjects()
+    .filter((project) => project.type === "case-study")
+    .slice(0, 3);
 
   return (
     <main className={styles.page}>

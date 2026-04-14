@@ -52,7 +52,9 @@ function getActiveSectionId(items: ScrollSectionNavItem[]) {
 }
 
 export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
-  const [activeId, setActiveId] = useState<string | null>(items[0]?.anchorId ?? null);
+  const [activeId, setActiveId] = useState<string | null>(
+    items[0]?.anchorId ?? null
+  );
   const listRef = useRef<HTMLOListElement | null>(null);
   const highlightRef = useRef<HTMLSpanElement | null>(null);
   const linkRefs = useRef(new Map<string, HTMLAnchorElement>());
@@ -94,7 +96,9 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
     window.addEventListener("resize", updateActiveSection);
     window.addEventListener("wheel", clearPendingTarget, { passive: true });
     window.addEventListener("touchmove", clearPendingTarget, { passive: true });
-    window.addEventListener("pointerdown", clearPendingTarget, { passive: true });
+    window.addEventListener("pointerdown", clearPendingTarget, {
+      passive: true,
+    });
     window.addEventListener("keydown", clearPendingTarget);
 
     return () => {
@@ -175,7 +179,9 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
                     linkRefs.current.delete(item.anchorId);
                   }}
                   href={`#${item.anchorId}`}
-                  className={`${editorial.sectionNavLink} ${isActive ? editorial.sectionNavLinkActive : ""}`.trim()}
+                  className={`${editorial.sectionNavLink} ${
+                    isActive ? editorial.sectionNavLinkActive : ""
+                  }`.trim()}
                   aria-current={isActive ? "location" : undefined}
                   onClick={(event) => {
                     event.preventDefault();
@@ -187,12 +193,22 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
                     }
 
                     pendingTargetRef.current = item.anchorId;
-                    section.scrollIntoView({ behavior: "smooth", block: "start" });
-                    window.history.replaceState(null, "", `#${item.anchorId}`);
+                    section.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                    window.history.replaceState(
+                      null,
+                      "",
+                      `#${item.anchorId}`
+                    );
                     setActiveId(item.anchorId);
                   }}
                 >
-                  <span className={editorial.sectionNavMarker} aria-hidden="true" />
+                  <span
+                    className={editorial.sectionNavMarker}
+                    aria-hidden="true"
+                  />
                   <span>{item.title}</span>
                 </a>
               </li>

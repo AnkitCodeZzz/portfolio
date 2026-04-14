@@ -174,3 +174,41 @@ export async function POST(request: Request) {
     markdown: `![${altText}](${publicPath})`,
   });
 }
+
+export async function DELETE(request: Request) {
+  if (!isLocalEditingEnabled(request)) {
+    return forbiddenResponse();
+  }
+
+  const body = (await request.json().catch(() => null)) as
+    | {
+        path?: unknown;
+      }
+    | null;
+  const publicPath = typeof body?.path === "string" ? body.path : "";
+  const match = /^\/(notes|work|pages)\/([a-z0-9][a-z0-9._-]*)$/i.exec(publicPath);
+
+  if (!match) {
+    return NextResponse.json({ error: "Invalid image path." }, { status: 400 });
+  }
+
+  const bucket = match[1];
+  const fileName = match[2];
+  const uploadsDirectory = path.join(process.cwd(), "public", bucket);
+  const filePath = path.normalize(path.join(uploadsDirectory, fileName));
+
+  if (!filePath.startsWith(uploadsDirectory)) {
+    return NextResponse.json({ error: "Invalid image path." }, { status: 400 });
+  }
+
+  if (!fs.existsSync(filePath)) {
+    return NextResponse.json(
+      { error: "That image file could not be found." },
+      { status: 404 }
+    );
+  }
+
+  fs.unlinkSync(filePath);
+
+  return NextResponse.json({ path: publicPath, deleted: true });
+}

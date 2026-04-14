@@ -29,6 +29,10 @@ type CarouselProps = {
   children: ReactNode;
 };
 
+export function MdxDivider() {
+  return <hr className="mdx-dividerRule" />;
+}
+
 export function Facts({ children }: FactsProps) {
   return <dl className="mdx-facts">{children}</dl>;
 }
@@ -54,7 +58,9 @@ export function Paragraph({ children }: ParagraphProps) {
   const isStandaloneMediaBlock =
     items.length === 1 &&
     isValidElement(items[0]) &&
-    (items[0].type === MdxImageDialog || items[0].type === ImageGrid);
+    (items[0].type === MdxImageDialog ||
+      items[0].type === ImageGrid ||
+      items[0].type === MdxDivider);
 
   if (isStandaloneMediaBlock) {
     return <>{children}</>;
@@ -118,6 +124,7 @@ export function Carousel({ children }: CarouselProps) {
 
 export const sharedMdxComponents = {
   p: Paragraph,
+  hr: MdxDivider,
   Facts,
   Fact,
   Accordion: MdxAccordion,

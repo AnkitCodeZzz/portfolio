@@ -6,11 +6,18 @@ import { useRouter } from "next/navigation";
 import AutoResizeTextarea from "./AutoResizeTextarea";
 import Breadcrumbs from "./Breadcrumbs";
 import Divider from "./Divider";
+import EditorAttachedImagesPanel from "./EditorAttachedImagesPanel";
 import EditorImageUploadButton from "./EditorImageUploadButton";
 import MdxGuidePopover from "./MdxGuidePopover";
 import editorial from "../styles/editorial.module.css";
 import styles from "../styles/noteEditor.module.css";
-import { insertMarkdownBlock, type EditorSelectionRange } from "../lib/editorMarkdown";
+import {
+  getReferencedMarkdownImages,
+  insertMarkdownBlock,
+  removeMarkdownImageReferences,
+  type EditorSelectionRange,
+  type ReferencedMarkdownImage,
+} from "../lib/editorMarkdown";
 import {
   PROJECT_COLOR_OPTIONS,
   PROJECT_TYPES,
@@ -446,6 +453,56 @@ export default function ProjectEditor({
         end: nextCaret,
       };
     });
+  }
+
+  const attachedImages = getReferencedMarkdownImages(draft.content);
+
+  async function handleDeleteImage(image: ReferencedMarkdownImage) {
+    const response = await fetch("/api/uploads", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        path: image.path,
+      }),
+    });
+
+    const data = (await response.json().catch(() => null)) as
+      | {
+          error?: string;
+        }
+      | null;
+
+    if (!response.ok) {
+      showToast(
+        {
+          tone: "error",
+          label: "Delete failed.",
+          detail: data?.error ?? "Unable to delete this image.",
+        },
+        3600
+      );
+      return;
+    }
+
+    setDraft((currentDraft) => ({
+      ...currentDraft,
+      content: removeMarkdownImageReferences(currentDraft.content, image.path),
+    }));
+
+    if (saveState !== "idle") {
+      setSaveState("idle");
+    }
+
+    showToast(
+      {
+        tone: "saved",
+        label: "Image deleted.",
+        detail: `Removed ${image.path} from this draft. Save the project to persist the cleanup.`,
+      },
+      4200
+    );
   }
 
   async function handleSave(
@@ -1043,6 +1100,11 @@ export default function ProjectEditor({
                     }
                   />
                 </div>
+
+                <EditorAttachedImagesPanel
+                  images={attachedImages}
+                  onDeleteImage={handleDeleteImage}
+                />
               </div>
             </div>
           </div>

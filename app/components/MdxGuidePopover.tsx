@@ -12,6 +12,7 @@ const MDX_GUIDE_ITEMS = [
   { label: "List", example: "- Bullet item" },
   { label: "Quote", example: "> Quote text" },
   { label: "Image", example: "![Alt text](/notes/image.jpg)" },
+  { label: "Separator", example: "---" },
   { label: "Image grid", example: "<ImageGrid columns={2}> or column={2}" },
   { label: "Facts", example: "<Facts> + <Fact />" },
   { label: "Accordion", example: "<Accordion title=\"...\">" },

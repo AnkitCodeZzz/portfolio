@@ -183,10 +183,23 @@ body::-moz-selection,
     margin: 0;
   }
 
-  .prose hr {
-    border: none;
-    border-top: 1px solid var(--site-border);
+  .prose hr,
+  .prose .mdx-dividerRule {
+    display: block;
+    width: 100%;
+    height: var(--site-size-divider);
     margin: 2em 0;
+    border: 0;
+    border-top: 1px solid var(--site-border);
+    border-bottom: 1px solid var(--site-border);
+    background:
+      repeating-linear-gradient(
+        45deg,
+        transparent 0,
+        transparent 4px,
+        color-mix(in srgb, var(--site-border) 92%, white) 4px,
+        color-mix(in srgb, var(--site-border) 92%, white) 5px
+      );
   }
 
   .prose table {

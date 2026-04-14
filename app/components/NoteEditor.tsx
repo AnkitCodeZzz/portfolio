@@ -11,11 +11,18 @@ import { useRouter } from "next/navigation";
 import AutoResizeTextarea from "./AutoResizeTextarea";
 import Breadcrumbs from "./Breadcrumbs";
 import Divider from "./Divider";
+import EditorAttachedImagesPanel from "./EditorAttachedImagesPanel";
 import EditorImageUploadButton from "./EditorImageUploadButton";
 import MdxGuidePopover from "./MdxGuidePopover";
 import editorial from "../styles/editorial.module.css";
 import styles from "../styles/noteEditor.module.css";
-import { insertMarkdownBlock, type EditorSelectionRange } from "../lib/editorMarkdown";
+import {
+  getReferencedMarkdownImages,
+  insertMarkdownBlock,
+  removeMarkdownImageReferences,
+  type EditorSelectionRange,
+  type ReferencedMarkdownImage,
+} from "../lib/editorMarkdown";
 import { getNoteTagColorCssValueForColor, NOTE_TAGS, sanitizeNoteTags } from "../lib/noteTags";
 import type { Note } from "../lib/notes";
 
@@ -620,6 +627,56 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
     });
   }
 
+  const attachedImages = getReferencedMarkdownImages(draft.content);
+
+  async function handleDeleteImage(image: ReferencedMarkdownImage) {
+    const response = await fetch("/api/uploads", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        path: image.path,
+      }),
+    });
+
+    const data = (await response.json().catch(() => null)) as
+      | {
+          error?: string;
+        }
+      | null;
+
+    if (!response.ok) {
+      showToast(
+        {
+          tone: "error",
+          label: "Delete failed.",
+          detail: data?.error ?? "Unable to delete this image.",
+        },
+        3600
+      );
+      return;
+    }
+
+    setDraft((currentDraft) => ({
+      ...currentDraft,
+      content: removeMarkdownImageReferences(currentDraft.content, image.path),
+    }));
+
+    if (saveState !== "idle") {
+      setSaveState("idle");
+    }
+
+    showToast(
+      {
+        tone: "saved",
+        label: "Image deleted.",
+        detail: `Removed ${image.path} from this draft. Save the note to persist the cleanup.`,
+      },
+      4200
+    );
+  }
+
   function handlePreview() {
     if (isCreating) {
       return;
@@ -975,10 +1032,7 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
                       aria-hidden="true"
                     />
                     <MdxGuidePopover />
-                    <span
-                      className={styles.bodyToolDivider}
-                      aria-hidden="true"
-                    />
+                    <span className={styles.bodyToolDivider} aria-hidden="true" />
                     <span
                       className={`${styles.bodyMeta} ${styles.bodyShortcut}`}
                     >
@@ -1005,6 +1059,11 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
                     onSelect={rememberBodySelection}
                   />
                 </div>
+
+                <EditorAttachedImagesPanel
+                  images={attachedImages}
+                  onDeleteImage={handleDeleteImage}
+                />
               </div>
             </div>
           </div>

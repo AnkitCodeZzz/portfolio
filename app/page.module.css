@@ -449,6 +449,7 @@ a.heroNow {
 .showcaseImage {
   display: block;
   object-fit: cover;
+  transition: transform 760ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .showcaseCard :global(img) {
@@ -492,13 +493,28 @@ a.heroNow {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
   min-height: min(82vh, 980px);
   min-width: 0;
 }
 
+.showcaseLightboxImageStage {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
 .showcaseLightboxImage {
-  object-fit: contain;
-  object-position: center;
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: min(82vh, 980px);
   background: transparent;
 }
 
@@ -684,9 +700,9 @@ a.heroNow {
   text-decoration-thickness: 1px;
   text-underline-offset: var(--site-line-decoration-offset);
   transition:
-    color var(--site-motion-link-duration) var(--site-motion-link-ease),
-    text-decoration-color var(--site-motion-link-duration) var(--site-motion-link-ease),
-    text-underline-offset var(--site-motion-link-duration) var(--site-motion-link-ease);
+    color 560ms cubic-bezier(0.16, 1, 0.3, 1),
+    text-decoration-color 560ms cubic-bezier(0.16, 1, 0.3, 1),
+    text-underline-offset 560ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .backgroundPlace {
@@ -694,9 +710,9 @@ a.heroNow {
   text-decoration-thickness: 1px;
   text-underline-offset: var(--site-line-decoration-offset);
   transition:
-    color var(--site-motion-link-duration) var(--site-motion-link-ease),
-    text-decoration-color var(--site-motion-link-duration) var(--site-motion-link-ease),
-    text-underline-offset var(--site-motion-link-duration) var(--site-motion-link-ease);
+    color 560ms cubic-bezier(0.16, 1, 0.3, 1),
+    text-decoration-color 560ms cubic-bezier(0.16, 1, 0.3, 1),
+    text-underline-offset 560ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .noteTitleLink {
@@ -1184,5 +1200,10 @@ a.heroNow {
   .noteTitleLink:focus-visible .backgroundPlace {
     color: var(--site-link-primary);
     text-decoration-color: var(--site-link-primary);
+  }
+
+  .showcaseCard:hover .showcaseImage,
+  .showcaseCard:focus-visible .showcaseImage {
+    transform: scale(calc(var(--media-inline-scale) * 1.035));
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import Image from "next/image";
 import DeleteProjectButton from "./DeleteProjectButton";
 import editorial from "../styles/editorial.module.css";
@@ -32,6 +32,8 @@ function CraftShowcaseThumbnail({
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const currentScaleRef = useRef(1.08);
   const targetScaleRef = useRef(1.08);
+  const stripePatternId = useId();
+  const stripeClipId = useId();
 
   useEffect(() => {
     const element = buttonRef.current;
@@ -110,6 +112,33 @@ function CraftShowcaseThumbnail({
       aria-label="Open craft showcase image"
     >
       <span className={`${editorial.utilityMediaFrame} ${homeStyles.showcaseFrame}`}>
+        <svg
+          className={editorial.utilityMediaStripe}
+          width="100%"
+          height="100%"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <defs>
+            <pattern
+              id={stripePatternId}
+              patternUnits="userSpaceOnUse"
+              width="4"
+              height="4"
+              patternTransform="scale(1.5)"
+            >
+              <g clipPath={`url(#${stripeClipId})`}>
+                <path d="M1 -1L5 3" stroke="currentColor" strokeWidth="0.5" />
+                <path d="M-1 1L3 5" stroke="currentColor" strokeWidth="0.5" />
+              </g>
+            </pattern>
+            <clipPath id={stripeClipId}>
+              <rect width="4" height="4" fill="white" />
+            </clipPath>
+          </defs>
+          <rect x="0" y="0" width="100%" height="100%" fill={`url(#${stripePatternId})`} />
+        </svg>
         <span
           className={`${editorial.utilityMediaInlineStage} ${homeStyles.showcaseStage}`}
         >
@@ -215,11 +244,13 @@ export default function CraftShowcase({
             role="dialog"
             aria-modal="true"
             aria-label="Craft showcase image"
-            onClick={(event) => {
-              event.stopPropagation();
-            }}
           >
-            <div className={homeStyles.showcaseLightboxTopBar}>
+            <div
+              className={homeStyles.showcaseLightboxTopBar}
+              onClick={(event) => {
+                event.stopPropagation();
+              }}
+            >
               {editingEnabled ? (
                 <div className={editorial.utilityRow}>
                   <DeleteProjectButton
@@ -241,37 +272,49 @@ export default function CraftShowcase({
               </button>
             </div>
 
-            <div className={homeStyles.showcaseLightboxMedia}>
-              <Image
-                src={activeItem.imageSrc}
-                alt={activeItem.alt}
-                fill
-                sizes="90vw"
-                className={homeStyles.showcaseLightboxImage}
-                priority
-              />
+            <div
+              className={homeStyles.showcaseLightboxMedia}
+              onClick={closeItem}
+            >
+              <div
+                className={homeStyles.showcaseLightboxImageStage}
+                onClick={(event) => {
+                  event.stopPropagation();
+                }}
+              >
+                <img
+                  src={activeItem.imageSrc}
+                  alt={activeItem.alt}
+                  className={homeStyles.showcaseLightboxImage}
+                />
 
-              <div className={homeStyles.showcaseLightboxOverlay}>
-                {hasMultipleImages ? (
-                  <div className={homeStyles.showcaseLightboxControls}>
-                    <button
-                      type="button"
-                      className={homeStyles.showcaseArrowButton}
-                      onClick={showPreviousImage}
-                      aria-label="Previous image"
-                    >
-                      <span aria-hidden="true">←</span>
-                    </button>
-                    <button
-                      type="button"
-                      className={homeStyles.showcaseArrowButton}
-                      onClick={showNextImage}
-                      aria-label="Next image"
-                    >
-                      <span aria-hidden="true">→</span>
-                    </button>
-                  </div>
-                ) : null}
+                <div
+                  className={homeStyles.showcaseLightboxOverlay}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                  }}
+                >
+                  {hasMultipleImages ? (
+                    <div className={homeStyles.showcaseLightboxControls}>
+                      <button
+                        type="button"
+                        className={homeStyles.showcaseArrowButton}
+                        onClick={showPreviousImage}
+                        aria-label="Previous image"
+                      >
+                        <span aria-hidden="true">←</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={homeStyles.showcaseArrowButton}
+                        onClick={showNextImage}
+                        aria-label="Next image"
+                      >
+                        <span aria-hidden="true">→</span>
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </div>
           </div>

@@ -222,7 +222,7 @@ a.heroNow {
   justify-content: space-between;
 }
 
-@media (max-width: 899px) {
+@media (max-width: 1023px) {
   .sidebarTick:first-child {
     visibility: hidden;
   }
@@ -1030,7 +1030,7 @@ a.heroNow {
     stroke var(--site-motion-link-duration) var(--site-motion-link-ease);
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1024px) {
   .header {
     position: static;
     z-index: auto;
@@ -1136,7 +1136,7 @@ a.heroNow {
 
 }
 
-@media (max-width: 899px) {
+@media (max-width: 1023px) {
   .showcaseLightbox {
     padding: 16px 24px 24px;
   }

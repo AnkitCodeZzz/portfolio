@@ -544,7 +544,7 @@ body::-moz-selection,
     margin-bottom: 0;
   }
 
-  @media (min-width: 1024px) {
+  @media (min-width: 1180px) {
     .prose .mdx-imageGrid.mdx-imageGridColumns3,
     .prose .mdx-imageGrid.mdx-imageGridColumns4 {
       width: min(1120px, calc(100vw - 88px));
@@ -554,7 +554,7 @@ body::-moz-selection,
     }
   }
 
-  @media (max-width: 1023px) {
+  @media (max-width: 1179px) {
     .prose .mdx-imageGrid {
       column-gap: 6px;
       row-gap: 6px;

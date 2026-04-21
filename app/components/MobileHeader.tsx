@@ -25,7 +25,7 @@ export default function MobileHeader({ showNav = true }: MobileHeaderProps) {
       return;
     }
 
-    const mediaQuery = window.matchMedia("(max-width: 899px)");
+    const mediaQuery = window.matchMedia("(max-width: 1179px)");
 
     const setHiddenState = (nextHidden: boolean) => {
       if (navHiddenRef.current === nextHidden) {

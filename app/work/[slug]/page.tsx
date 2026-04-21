@@ -107,7 +107,7 @@ export default async function WorkProjectPage({
         </div>
       </section>
 
-      <div className={editorial.readingSections}>
+      <div className={`${editorial.readingSections} ${editorial.readingSectionsFlush}`.trim()}>
         {contentSections.length > 0 ? <Divider className={editorial.detailContentDivider} /> : null}
         <div className={editorial.readingLayout}>
           <ScrollSectionNav

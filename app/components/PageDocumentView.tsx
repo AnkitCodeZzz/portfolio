@@ -23,8 +23,6 @@ export default function PageDocumentView({ page }: PageDocumentViewProps) {
   const contentSections = splitMdxIntoSections(page.content);
   const editingEnabled = process.env.NODE_ENV === "development";
   const route = `/${page.key}`;
-  const isReadmePage = page.key === "readme";
-
   return (
     <PageFrame className={editorial.detailPage}>
       <section
@@ -57,7 +55,7 @@ export default function PageDocumentView({ page }: PageDocumentViewProps) {
       </section>
 
       <div
-        className={`${editorial.readingSections} ${isReadmePage ? editorial.readingSectionsFlush : ""}`.trim()}
+        className={`${editorial.readingSections} ${editorial.readingSectionsFlush}`.trim()}
       >
         {contentSections.length > 0 ? (
           <Divider className={editorial.detailContentDivider} />

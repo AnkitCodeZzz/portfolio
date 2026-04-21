@@ -128,6 +128,8 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
 
       setWaveCenter(nextWaveCenter);
 
+      const labelWaveCenter = nextWaveCenter + 10;
+
       const activeIndex = anchorTops.findIndex((anchorTop, index) => {
         const previousMidpoint =
           index === 0 ? Number.NEGATIVE_INFINITY : (anchorTops[index - 1] + anchorTop) / 2;
@@ -136,7 +138,7 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
             ? Number.POSITIVE_INFINITY
             : (anchorTop + anchorTops[index + 1]) / 2;
 
-        return nextWaveCenter >= previousMidpoint && nextWaveCenter < nextMidpoint;
+        return labelWaveCenter >= previousMidpoint && labelWaveCenter < nextMidpoint;
       });
 
       const pendingTarget = pendingTargetRef.current;

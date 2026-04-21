@@ -107,7 +107,7 @@ export default async function NotePage({
         </div>
       </section>
 
-      <div className={editorial.readingSections}>
+      <div className={`${editorial.readingSections} ${editorial.readingSectionsFlush}`.trim()}>
         {contentSections.length > 0 ? <Divider className={editorial.detailContentDivider} /> : null}
         <div className={editorial.readingLayout}>
           <ScrollSectionNav

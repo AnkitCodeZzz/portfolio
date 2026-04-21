@@ -46,6 +46,10 @@ function getWaveWidthAt(top: number, waveCenter: number) {
   return BASE_STROKE_WIDTH + gaussian(top - waveCenter, WAVE_SIGMA) * WAVE_AMPLITUDE;
 }
 
+function snapPixel(value: number) {
+  return Math.round(value);
+}
+
 function smoothstep(edge0: number, edge1: number, value: number) {
   const t = clamp((value - edge0) / Math.max(1, edge1 - edge0), 0, 1);
 
@@ -230,9 +234,7 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
         const anchorTop =
           markerTops[index] ?? index * MAJOR_ROW_STEP + LABEL_LINE_HEIGHT / 2;
         const strength = gaussian(anchorTop - waveCenter, WAVE_SIGMA);
-        return Number(
-          (MAJOR_STROKE_WIDTH + strength * (24 - MAJOR_STROKE_WIDTH)).toFixed(2)
-        );
+        return snapPixel(MAJOR_STROKE_WIDTH + strength * (24 - MAJOR_STROKE_WIDTH));
       }),
     [items, markerTops, waveCenter]
   );
@@ -253,10 +255,8 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
       return {
         kind: "major" as const,
         anchorId: items[index]?.anchorId ?? `section-${index}`,
-        width: Number(
-          (MAJOR_STROKE_WIDTH + strength * (24 - MAJOR_STROKE_WIDTH)).toFixed(2)
-        ),
-        top,
+        width: snapPixel(MAJOR_STROKE_WIDTH + strength * (24 - MAJOR_STROKE_WIDTH)),
+        top: snapPixel(top),
       };
     });
 
@@ -277,8 +277,8 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
 
         minorRows.push({
           kind: "minor",
-          width: Number(getWaveWidthAt(top, waveCenter).toFixed(2)),
-          top,
+          width: snapPixel(getWaveWidthAt(top, waveCenter)),
+          top: snapPixel(top),
         });
         continue;
       }
@@ -308,8 +308,8 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
 
         minorRows.push({
           kind: "minor",
-          width: Number(getWaveWidthAt(top, waveCenter).toFixed(2)),
-          top,
+          width: snapPixel(getWaveWidthAt(top, waveCenter)),
+          top: snapPixel(top),
         });
       });
     }

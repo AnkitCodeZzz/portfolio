@@ -199,6 +199,6 @@
 
 @media (min-width: 1280px) {
   :root {
-    --site-content-max: calc(100vw - 640px);
+    --site-content-max: min(1120px, calc(100vw - 640px));
   }
 }

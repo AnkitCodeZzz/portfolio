@@ -684,7 +684,7 @@
     #d7d7de calc(100% - (var(--section-nav-wave-strength, 0) * 100%)),
     var(--site-tag-olive) calc(var(--section-nav-wave-strength, 0) * 100%)
   );
-  opacity: calc(0.88 + (var(--section-nav-wave-strength, 0) * 0.12));
+  opacity: calc(0.82 + (var(--section-nav-wave-strength, 0) * 0.18));
 }
 
 .sectionNavFieldStrokeHovered {

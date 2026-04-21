@@ -16,6 +16,7 @@ type ScrollSectionNavProps = {
 type NavRow =
   | {
       kind: "major";
+      anchorId: string;
       width: number;
       top: number;
     }
@@ -33,8 +34,6 @@ const BASE_STROKE_WIDTH = 8;
 const MAJOR_STROKE_WIDTH = 12;
 const WAVE_AMPLITUDE = 16;
 const WAVE_SIGMA = 14;
-const MAJOR_ROW_EXCLUSION = 2;
-
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
@@ -57,18 +56,61 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
   const [activeId, setActiveId] = useState<string | null>(
     items[0]?.anchorId ?? null
   );
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [waveCenter, setWaveCenter] = useState<number>(LABEL_LINE_HEIGHT / 2);
   const linkRefs = useRef(new Map<string, HTMLAnchorElement>());
+  const rowRefs = useRef(new Map<string, HTMLLIElement>());
   const pendingTargetRef = useRef<string | null>(null);
+  const [markerTops, setMarkerTops] = useState<number[]>(
+    items.map((_, index) => index * MAJOR_ROW_STEP + LABEL_LINE_HEIGHT / 2)
+  );
+
+  useEffect(() => {
+    const measure = () => {
+      const nextMarkerTops = items.map((item, index) => {
+        const row = rowRefs.current.get(item.anchorId);
+
+        if (!row) {
+          return index * MAJOR_ROW_STEP + LABEL_LINE_HEIGHT / 2;
+        }
+
+        return row.offsetTop + LABEL_LINE_HEIGHT / 2;
+      });
+
+      setMarkerTops((current) => {
+        if (
+          current.length === nextMarkerTops.length &&
+          current.every((value, index) => Math.abs(value - nextMarkerTops[index]) < 0.5)
+        ) {
+          return current;
+        }
+
+        return nextMarkerTops;
+      });
+    };
+
+    const frame = window.requestAnimationFrame(measure);
+    const observer = new ResizeObserver(measure);
+
+    rowRefs.current.forEach((row) => observer.observe(row));
+    window.addEventListener("resize", measure);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [items]);
 
   useEffect(() => {
     if (items.length === 0) {
       return;
     }
 
-    const anchorTops = items.map(
-      (_, index) => index * MAJOR_ROW_STEP + LABEL_LINE_HEIGHT / 2
-    );
+    const anchorTops =
+      markerTops.length === items.length
+        ? markerTops
+        : items.map((_, index) => index * MAJOR_ROW_STEP + LABEL_LINE_HEIGHT / 2);
     const firstAnchorTop = anchorTops[0] ?? LABEL_LINE_HEIGHT / 2;
 
     setWaveCenter(firstAnchorTop);
@@ -180,18 +222,19 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
       window.removeEventListener("pointerdown", clearPendingTarget);
       window.removeEventListener("keydown", clearPendingTarget);
     };
-  }, [items]);
+  }, [items, markerTops]);
 
   const majorWidths = useMemo(
     () =>
       items.map((_, index) => {
-        const anchorTop = index * MAJOR_ROW_STEP + LABEL_LINE_HEIGHT / 2;
+        const anchorTop =
+          markerTops[index] ?? index * MAJOR_ROW_STEP + LABEL_LINE_HEIGHT / 2;
         const strength = gaussian(anchorTop - waveCenter, WAVE_SIGMA);
         return Number(
           (MAJOR_STROKE_WIDTH + strength * (24 - MAJOR_STROKE_WIDTH)).toFixed(2)
         );
       }),
-    [items, waveCenter]
+    [items, markerTops, waveCenter]
   );
 
   const rows = useMemo<NavRow[]>(() => {
@@ -199,33 +242,80 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
       return [];
     }
 
-    const anchorTops = items.map(
-      (_, index) => index * MAJOR_ROW_STEP + LABEL_LINE_HEIGHT / 2
-    );
-    const firstTop = anchorTops[0] ?? 0;
-    const lastTop = anchorTops[anchorTops.length - 1] ?? 0;
-    const startTop = firstTop;
-    const endTop = lastTop;
-    const sampledTops: number[] = [];
+    const anchorTops =
+      markerTops.length === items.length
+        ? markerTops
+        : items.map((_, index) => index * MAJOR_ROW_STEP + LABEL_LINE_HEIGHT / 2);
 
-    for (let top = startTop; top <= endTop + 0.01; top += FIELD_STEP) {
-      sampledTops.push(Number(top.toFixed(2)));
-    }
-
-    const filteredTops = sampledTops.filter((top) =>
-      anchorTops.every((anchorTop) => Math.abs(top - anchorTop) > MAJOR_ROW_EXCLUSION)
-    );
-
-    return filteredTops.map((top) => {
-      const width = getWaveWidthAt(top, waveCenter);
+    const majorRows = anchorTops.map((top, index) => {
+      const strength = gaussian(top - waveCenter, WAVE_SIGMA);
 
       return {
-        kind: "minor",
-        width: Number(width.toFixed(2)),
+        kind: "major" as const,
+        anchorId: items[index]?.anchorId ?? `section-${index}`,
+        width: Number(
+          (MAJOR_STROKE_WIDTH + strength * (24 - MAJOR_STROKE_WIDTH)).toFixed(2)
+        ),
         top,
       };
     });
-  }, [items, waveCenter]);
+
+    const minorRows: NavRow[] = [];
+
+    for (let index = 0; index < anchorTops.length - 1; index += 1) {
+      const currentTop = anchorTops[index] ?? 0;
+      const nextTop = anchorTops[index + 1] ?? currentTop;
+      const gap = nextTop - currentTop;
+      const strokeCount = Math.max(0, Math.floor(gap / FIELD_STEP) - 1);
+
+      if (strokeCount === 0) {
+        continue;
+      }
+
+      if (strokeCount === 1) {
+        const top = Number(((currentTop + nextTop) / 2).toFixed(2));
+
+        minorRows.push({
+          kind: "minor",
+          width: Number(getWaveWidthAt(top, waveCenter).toFixed(2)),
+          top,
+        });
+        continue;
+      }
+
+      const positions: number[] = [
+        currentTop + FIELD_STEP,
+        nextTop - FIELD_STEP,
+      ];
+
+      if (strokeCount > 2) {
+        const interiorCount = strokeCount - 2;
+        const interiorStart = currentTop + FIELD_STEP;
+        const interiorEnd = nextTop - FIELD_STEP;
+        const interiorStep = (interiorEnd - interiorStart) / (interiorCount + 1);
+
+        for (let interiorIndex = 1; interiorIndex <= interiorCount; interiorIndex += 1) {
+          positions.splice(
+            positions.length - 1,
+            0,
+            interiorStart + interiorStep * interiorIndex
+          );
+        }
+      }
+
+      positions.forEach((position) => {
+        const top = Number(position.toFixed(2));
+
+        minorRows.push({
+          kind: "minor",
+          width: Number(getWaveWidthAt(top, waveCenter).toFixed(2)),
+          top,
+        });
+      });
+    }
+
+    return [...majorRows, ...minorRows].sort((a, b) => a.top - b.top);
+  }, [items, markerTops, waveCenter]);
 
   if (items.length < 2) {
     return null;
@@ -242,6 +332,10 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
                 row.kind === "major"
                   ? editorial.sectionNavFieldStrokeMajor
                   : editorial.sectionNavFieldStrokeMinor
+              } ${
+                row.kind === "major" && row.anchorId === hoveredId
+                  ? editorial.sectionNavFieldStrokeHovered
+                  : ""
               }`}
               style={
                 {
@@ -259,12 +353,21 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
         <ol className={editorial.sectionNavList}>
           {items.map((item, index) => {
             const isActive = item.anchorId === activeId;
-            const markerTop = index * MAJOR_ROW_STEP + LABEL_LINE_HEIGHT / 2;
+            const markerTop =
+              markerTops[index] ?? index * MAJOR_ROW_STEP + LABEL_LINE_HEIGHT / 2;
             const markerStrength = gaussian(markerTop - waveCenter, WAVE_SIGMA);
             return (
               <li
                 key={item.anchorId}
                 className={`${editorial.sectionNavRow} ${editorial.sectionNavRowMajor}`}
+                ref={(node) => {
+                  if (node) {
+                    rowRefs.current.set(item.anchorId, node);
+                    return;
+                  }
+
+                  rowRefs.current.delete(item.anchorId);
+                }}
               >
                 <a
                   ref={(node) => {
@@ -280,6 +383,24 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
                     isActive ? editorial.sectionNavLinkActive : ""
                   }`.trim()}
                   aria-current={isActive ? "location" : undefined}
+                  style={
+                    {
+                      "--section-nav-wave-strength": `${markerStrength.toFixed(3)}`,
+                      "--section-nav-marker-width": `${majorWidths[index] ?? MAJOR_STROKE_WIDTH}px`,
+                    } as CSSProperties
+                  }
+                  onMouseEnter={() => setHoveredId(item.anchorId)}
+                  onMouseLeave={() =>
+                    setHoveredId((current) =>
+                      current === item.anchorId ? null : current
+                    )
+                  }
+                  onFocus={() => setHoveredId(item.anchorId)}
+                  onBlur={() =>
+                    setHoveredId((current) =>
+                      current === item.anchorId ? null : current
+                    )
+                  }
                   onClick={(event) => {
                     event.preventDefault();
 
@@ -302,16 +423,6 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
                     setActiveId(item.anchorId);
                   }}
                 >
-                  <span
-                    className={editorial.sectionNavMarker}
-                    aria-hidden="true"
-                    style={
-                      {
-                        "--section-nav-stroke-width": `${majorWidths[index] ?? MAJOR_STROKE_WIDTH}px`,
-                        "--section-nav-wave-strength": `${markerStrength.toFixed(3)}`,
-                      } as CSSProperties
-                    }
-                  />
                   <span>{item.title}</span>
                 </a>
               </li>

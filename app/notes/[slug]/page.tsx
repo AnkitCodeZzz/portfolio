@@ -45,13 +45,13 @@ export default async function NotePage({
     <PageFrame className={editorial.detailPage}>
       <NoteScrollRestorer storageKey={`note-scroll:${note.slug}`} />
       <section
-        className={editorial.detailHeader}
+        className={`${editorial.detailHeader} ${editorial.detailHeaderWithBreadcrumbs}`}
         data-ruler-track
         data-ruler-pad-bottom={220}
       >
         <div className={editorial.detailBlock}>
-          <div className={editorial.detailLead}>
-            <div className={editorial.detailTopBar}>
+          <div className={`${editorial.detailLead} ${editorial.detailLeadWithBreadcrumbs}`}>
+            <div className={`${editorial.detailTopBar} ${editorial.detailTopBarWithBreadcrumbs}`}>
               <Breadcrumbs
                 items={[
                   { label: "notes", href: "/notes" },

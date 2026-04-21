@@ -741,9 +741,9 @@ export default function NoteEditor({ note, mode = "edit" }: NoteEditorProps) {
 
   return (
     <>
-      <section className={editorial.detailHeader} data-ruler-track>
+      <section className={`${editorial.detailHeader} ${editorial.detailHeaderWithBreadcrumbs}`} data-ruler-track>
         <div className={`${editorial.detailBlock} ${styles.editorDetailBlock}`}>
-          <div className={styles.editorTopBar}>
+          <div className={`${styles.editorTopBar} ${editorial.detailTopBarWithBreadcrumbs}`}>
             <Breadcrumbs
               items={
                 isCreating

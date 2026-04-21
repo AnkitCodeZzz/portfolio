@@ -62,8 +62,10 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
   );
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [waveCenter, setWaveCenter] = useState<number>(LABEL_LINE_HEIGHT / 2);
+  const [navTop, setNavTop] = useState<number | null>(null);
   const linkRefs = useRef(new Map<string, HTMLAnchorElement>());
   const rowRefs = useRef(new Map<string, HTMLLIElement>());
+  const navInnerRef = useRef<HTMLElement | null>(null);
   const pendingTargetRef = useRef<string | null>(null);
   const [markerTops, setMarkerTops] = useState<number[]>(
     items.map((_, index) => index * MAJOR_ROW_STEP + LABEL_LINE_HEIGHT / 2)
@@ -71,6 +73,13 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
 
   useEffect(() => {
     const measure = () => {
+      const navHeight = navInnerRef.current?.offsetHeight ?? 0;
+      const viewportHeight = window.innerHeight;
+      const centeredTop = Math.round(viewportHeight / 2 - navHeight / 2);
+      const clampedTop = Math.max(80, centeredTop);
+
+      setNavTop(clampedTop);
+
       const nextMarkerTops = items.map((item, index) => {
         const row = rowRefs.current.get(item.anchorId);
 
@@ -322,8 +331,15 @@ export default function ScrollSectionNav({ items }: ScrollSectionNavProps) {
   }
 
   return (
-    <div className={editorial.sectionNav}>
-      <nav className={editorial.sectionNavInner} aria-label="Section navigation">
+    <div
+      className={editorial.sectionNav}
+      style={navTop === null ? undefined : ({ top: `${navTop}px` } as CSSProperties)}
+    >
+      <nav
+        ref={navInnerRef}
+        className={editorial.sectionNavInner}
+        aria-label="Section navigation"
+      >
         <div className={editorial.sectionNavField} aria-hidden="true">
           {rows.map((row, index) => (
             <span

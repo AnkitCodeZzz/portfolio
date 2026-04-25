@@ -671,7 +671,6 @@
   width: var(--section-nav-stroke-width, 8px);
   min-width: var(--section-nav-stroke-width, 8px);
   height: 1px;
-  border-radius: 999px;
   transform-origin: left center;
   transition:
     background-color 180ms ease,

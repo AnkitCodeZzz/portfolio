@@ -196,3 +196,11 @@
   --site-motion-tag-scramble-step: 44ms;
   --site-size-link-underline: 1px;
 }
+
+@media (max-width: 1023px) {
+  :root {
+    --site-size-body: 14px;
+    --site-line-body: 23px;
+    --site-muted: #414149;
+  }
+}

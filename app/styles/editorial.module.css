@@ -251,6 +251,13 @@
   color: var(--site-muted);
 }
 
+@media (max-width: 1023px) {
+  .entryDescription,
+  .logEntry {
+    font-weight: var(--font-weight-medium);
+  }
+}
+
 .metric {
   color: var(--site-muted-soft);
 }

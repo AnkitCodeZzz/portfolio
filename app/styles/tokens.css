@@ -199,8 +199,11 @@
 
 @media (max-width: 1023px) {
   :root {
+    --site-size-section-title: 22px;
+    --site-size-page-title: 24px;
+    --site-size-entry-title: 15px;
     --site-size-body: 14px;
     --site-line-body: 23px;
-    --site-muted: #414149;
+    --site-muted: #191920;
   }
 }

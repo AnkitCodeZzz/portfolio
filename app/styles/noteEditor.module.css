@@ -1060,6 +1060,13 @@
   color: #696971;
 }
 
+@media (max-width: 1023px) {
+  .bodyInput {
+    font-weight: var(--font-weight-medium);
+    color: var(--site-muted);
+  }
+}
+
 @media (hover: hover) {
   .editorActionPreview:not(:disabled):hover,
   .editorActionPreview:not(:disabled):focus-visible {

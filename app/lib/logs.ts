@@ -36,4 +36,3 @@ export const logs = [
       entry: "Built homepage layout at /home — hero, selected work, experience & education. Refined typography: Fraunces wt 300, letter-spacing, line-height. Tags with accent colors. Nav switched to mono font. Set up MDX blog system with prose styling. Added footer. Fixed contribution graph timezone.",
     },
   ];
-xx

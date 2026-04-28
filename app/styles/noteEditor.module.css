@@ -1063,7 +1063,7 @@
 @media (max-width: 1023px) {
   .bodyInput {
     font-weight: var(--font-weight-medium);
-    color: var(--site-muted);
+    color: var(--site-ink-strong);
   }
 }
 

@@ -80,7 +80,10 @@
 .breadcrumbs {
   display: inline-flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
   gap: 0;
   font-family: var(--font-family-mono);
   font-size: var(--site-size-mono);
@@ -92,6 +95,7 @@
 .breadcrumbItem {
   display: inline-flex;
   align-items: center;
+  min-width: 0;
 }
 
 .breadcrumbItemWithSeparator {
@@ -102,6 +106,8 @@
   --site-link-accent: var(--site-link-primary);
   display: inline-flex;
   align-items: center;
+  min-width: 0;
+  max-width: 100%;
   gap: var(--site-space-entry-gap);
   color: var(--site-muted-subtle);
   text-decoration: none;
@@ -116,10 +122,20 @@
 .breadcrumbCurrentGroup {
   display: inline-flex;
   align-items: center;
+  min-width: 0;
+  max-width: 100%;
   gap: var(--site-space-entry-gap);
   white-space: nowrap;
   color: var(--site-muted);
   font-weight: var(--font-weight-medium);
+}
+
+.breadcrumbLabel {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .breadcrumbIntermediateGroup {
@@ -255,6 +271,7 @@
   .entryDescription,
   .logEntry {
     font-weight: var(--font-weight-medium);
+    color: var(--site-ink-strong);
   }
 }
 

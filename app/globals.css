@@ -59,6 +59,7 @@ body::-moz-selection,
   .prose p {
     font-family: var(--font-family-body);
     font-size: var(--site-size-body);
+    font-weight: var(--font-weight-normal);
     line-height: var(--site-line-body);
     color: var(--site-muted);
     margin-bottom: 20px !important;
@@ -93,6 +94,7 @@ body::-moz-selection,
   .prose li {
     font-family: var(--font-family-body);
     font-size: var(--site-size-body);
+    font-weight: var(--font-weight-normal);
     line-height: var(--site-line-body);
     color: var(--site-muted);
     margin-bottom: 8px;
@@ -449,6 +451,18 @@ body::-moz-selection,
     line-height: var(--site-line-body);
     color: var(--site-muted);
     margin-bottom: 20px !important;
+  }
+
+  @media (max-width: 1023px) {
+    .prose p,
+    .prose li,
+    .prose td,
+    .prose dd,
+    .prose blockquote,
+    .prose .mdx-accordionPanel p {
+      font-weight: var(--font-weight-medium);
+      color: var(--site-ink-strong);
+    }
   }
 
   .prose .mdx-accordionPanel > :first-child {

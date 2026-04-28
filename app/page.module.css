@@ -128,7 +128,7 @@
   font-size: var(--site-size-mono);
   line-height: 1;
   color: var(--site-muted);
-  font-weight: var(--font-weight-normal);
+  font-weight: var(--font-weight-medium);
 }
 
 .navWork {
@@ -729,6 +729,14 @@ a.heroNow {
   font-weight: var(--font-weight-normal);
   line-height: var(--site-line-body);
   color: var(--site-muted);
+}
+
+@media (max-width: 1023px) {
+  .projectDescription,
+  .backgroundDescription {
+    font-weight: var(--font-weight-medium);
+    color: var(--site-ink-strong);
+  }
 }
 
 .tagBrown {

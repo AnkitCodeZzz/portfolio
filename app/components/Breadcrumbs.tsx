@@ -38,7 +38,7 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
                       /
                     </span>
                   ) : null}
-                  <span>{item.label}</span>
+                  <span className={editorial.breadcrumbLabel}>{item.label}</span>
                 </Link>
               ) : (
                 <span
@@ -51,7 +51,11 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
                       /
                     </span>
                   ) : null}
-                  <span className={isLast ? editorial.breadcrumbCurrent : undefined}>
+                  <span
+                    className={`${editorial.breadcrumbLabel} ${
+                      isLast ? editorial.breadcrumbCurrent : ""
+                    }`.trim()}
+                  >
                     {item.label}
                   </span>
                 </span>
